@@ -72,3 +72,29 @@ module BCM
   extern 'void bcm2835_pwm_set_range(unsigned char channel, unsigned int range)'
   extern 'void bcm2835_pwm_set_data(unsigned char channel, unsigned int data)'
 end
+
+##
+# SPI wrapper
+module SPI
+  CS0 = 0
+  CS1 = 1
+
+  ##
+  # @param array tx data
+  # @param cs chip select (CS0 or CS1)
+  def write(array, cs)
+    BCM.bcm2835_spi_begin
+    BCM.bcm2835_spi_setBitOrder(1) # MSB First
+    BCM.bcm2835_spi_setDataMode(0) # CPOL = 0, CPHA = 0
+    BCM.bcm2835_spi_setClockDivider(128)
+    BCM.bcm2835_spi_chipSelect(cs)
+    BCM.bcm2835_spi_setChipSelectPolarity(cs, 0) # LOW
+    BCM.bcm2835_spi_writenb(array, array.size)
+    BCM.bcm2835_spi_end
+  end
+end
+
+if BCM.bcm2835_init.zero?
+  warn 'failed to init bcm2835.'
+  exit 1
+end
