@@ -92,6 +92,8 @@ module SPI
     BCM.bcm2835_spi_writenb(array, array.size)
     BCM.bcm2835_spi_end
   end
+
+  module_function :write
 end
 
 if BCM.bcm2835_init.zero?
