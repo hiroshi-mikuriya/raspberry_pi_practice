@@ -8,11 +8,13 @@
 - P5 I2C -> enable  
 
 /etc/modules に追記（不要な項目もありそう）  
-> snd-bcm2835  
+
+snd-bcm2835  
 spidev  
 i2c-bcm2708  
 i2c-dev  
 spi_bcm2835
+
 
 ここでRaspberry Piを再起動する
 
@@ -26,7 +28,8 @@ bcm2835はRaspberryPiのIOを操作するライブラリ
 rubyのgem（Wrapper）も用意されているが、うまくインストールできなかったので諦めた。
 
 bcm2835のインストール  
-> $ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz  
+
+$ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz  
 $ tar zxvf bcm2835-1.44.tar.gz  
 $ cd bcm2835-1.44/  
 $ sudo ./configure  
