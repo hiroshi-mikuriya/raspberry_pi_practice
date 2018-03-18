@@ -7,12 +7,14 @@
 - P4 SPI -> enable  
 - P5 I2C -> enable  
 
-/etc/modules に追記  
+/etc/modules に追記（不要な項目もありそう）  
 > snd-bcm2835  
 spidev  
 i2c-bcm2708  
-i2c-dev
+i2c-dev  
 spi_bcm2835
+
+ここでRaspberry Piを再起動する
 
 SPI開通確認  
 `ls -la /dev/spidev*`
@@ -21,7 +23,7 @@ I2C開通確認
 `sudo i2cdetect -y 1`
 
 bcm2835はRaspberryPiのIOを操作するライブラリ  
-rubyのgemも用意されている
+rubyのgem（Wrapper）も用意されているが、うまくインストールできなかったので諦めた。
 
 bcm2835のインストール  
 > $ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz  
@@ -33,8 +35,12 @@ $ cd src
 $ cc -shared bcm2835.o -o libbcm2835.so  
 $ cd ../
 $ sudo make install  
-$ sudo mv src/libbmc2835.so /usr/local/lib  
-$ sudo gem install bcm2835
+$ sudo mv src/libbcm2835.so /usr/local/lib
+
+上記でbcm2835をso形式にしたので、Fiddleを使ってRubyから直接呼び出せる。(bcm2835.rb < 自作)
+
+spi.rbは実際にSPI通信を行う例
+
 
 ## 参考URL
 
