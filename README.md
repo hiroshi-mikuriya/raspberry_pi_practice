@@ -12,6 +12,7 @@
 spidev  
 i2c-bcm2708  
 i2c-dev
+spi_bcm2835
 
 SPI開通確認  
 `ls -la /dev/spidev*`
@@ -27,3 +28,7 @@ https://qiita.com/cattaka/items/43745dde59e7f2b4988d
 https://blog.ymyzk.com/2015/02/enable-raspberry-pi-i2c/
 * Raspberry PiでSPI通信機能を利用する（NTP時計を無線LAN化する）  
 http://www.soramimi.jp/raspberrypi/spi/
+* Raspberry Pi ZeroをUSBケーブル1本で遊ぶ  
+https://www.raspi.jp/2016/07/pizero-usb-otg/
+* ラズベリーパイ】GPIOライブラリ｢pi_piper」のご紹介
+http://www.kibanhonpo.com/lab/pi_piper/
