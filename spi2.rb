@@ -15,13 +15,16 @@ def write_spi(tx)
   BCM.bcm2835_spi_setClockDivider(64) # 64 = 256ns = 3.90625MHz
   BCM.bcm2835_spi_chipSelect(CS0) # Chip Select 0
   BCM.bcm2835_spi_setChipSelectPolarity(CS0, 0) # LOW
-  BCM.bcm2835_spi_writenb(tx, tx.size)
+  # rx = BCM.bcm2835_spi_transfer(tx)
+  BCM.bcm2835_spi_transfernb(tx, rx, tx.size)
+  puts tx == rx ? 'success' : "error #{tx} != #{rx}"
   BCM.bcm2835_spi_end
 end
 
 loop do
-  tx = %w[1 2 3 4].map(&:hex).pack('C*')
+  tx = %w[2 0 0 55 AA].map(&:hex).pack('c*')
   write_spi(tx)
+  sleep(1)
 end
 
 BCM.bcm2835_close
