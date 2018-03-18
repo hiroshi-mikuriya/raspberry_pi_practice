@@ -34,3 +34,5 @@ https://www.raspi.jp/2016/07/pizero-usb-otg/
 http://www.kibanhonpo.com/lab/pi_piper/
 * bcm2835 ライブラリによるスイッチ入力とLEDの点滅  
 https://tomosoft.jp/design/?p=5252
+* bcm2835.h  
+http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html

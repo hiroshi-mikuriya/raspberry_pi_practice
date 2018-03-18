@@ -3,7 +3,7 @@ UNAME := ${shell uname}
 CXX       := g++
 CXXFLAGS  := -Wall -std=c++0x -v $(CXXDEFS)
 
-TARGET    := spicpp
+TARGET    := myspi
 PROJ_ROOT := $(realpath ./)
 SRCS      := main.cpp
 LIBS      := -lpthread \
