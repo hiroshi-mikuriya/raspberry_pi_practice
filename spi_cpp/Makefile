@@ -8,6 +8,7 @@ PROJ_ROOT := $(realpath ./)
 SRCS      := main.cpp
 LIBS      := -lpthread \
 	     -ldl \
+		 -lbcm2835 \
 	     -lm
 ifeq ($(ENABLE_REAL_3D_LED_CUBE), true)
 SRCS := $(SRCS) main.cpp
