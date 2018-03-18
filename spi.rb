@@ -16,6 +16,7 @@ def write_spi(tx)
   BCM.bcm2835_spi_chipSelect(CS0) # Chip Select 0
   BCM.bcm2835_spi_setChipSelectPolarity(CS0, 0) # LOW
   # rx = BCM.bcm2835_spi_transfer(tx)
+  # BCM.bcm2835_spi_writenb(tx, tx.size)
   BCM.bcm2835_spi_transfernb(tx, rx, tx.size)
   puts tx == rx ? 'success' : "error #{tx} != #{rx}"
   BCM.bcm2835_spi_end
