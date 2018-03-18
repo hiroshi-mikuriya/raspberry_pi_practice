@@ -32,3 +32,5 @@ http://www.soramimi.jp/raspberrypi/spi/
 https://www.raspi.jp/2016/07/pizero-usb-otg/
 * ラズベリーパイ】GPIOライブラリ｢pi_piper」のご紹介
 http://www.kibanhonpo.com/lab/pi_piper/
+* bcm2835 ライブラリによるスイッチ入力とLEDの点滅  
+https://tomosoft.jp/design/?p=5252

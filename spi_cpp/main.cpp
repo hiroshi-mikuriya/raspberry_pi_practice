@@ -24,7 +24,7 @@ namespace
     }
 }
 
-int main(int argv, const char * argc)
+int main(int argv, char ** argc)
 {
     for(;;) {
         std::string s;
