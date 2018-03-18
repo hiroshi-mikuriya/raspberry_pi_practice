@@ -17,8 +17,7 @@ namespace
         //bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64); // Not default. Divide 64 = 256ns = 3.90625MHz
         bcm2835_spi_chipSelect(BCM2835_SPI_CS0);                      // The default
         bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);      // the default        
-        std::vector<char> rx(tx.size());
-        bcm2835_spi_transfernb(const_cast<char*>(tx.data()), const_cast<char*>(rx.data()), tx.size());        
+        bcm2835_spi_writenb(tx.data(), tx.size());        
         bcm2835_spi_end();
         bcm2835_close();
     }
