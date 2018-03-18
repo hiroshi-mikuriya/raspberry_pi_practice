@@ -1,4 +1,7 @@
-require 'spi'
-s = SPI.new(device: '/dev/spidev32766.0')
-s.speed = 500_000
-s.xfer(txdata: [0x10, 0x00])
+require 'open3'
+
+Open3.popen('./myspi') do |io|
+  d = %w[1 2 3 4].map(&:hex).pack('C*')
+  io.puts d
+  sleep(1)
+end
