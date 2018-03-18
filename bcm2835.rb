@@ -93,7 +93,21 @@ module SPI
     BCM.bcm2835_spi_end
   end
 
+  def read_write(array, cs)
+    buffer = ([0] * array.size).pack('c*')
+    BCM.bcm2835_spi_begin
+    BCM.bcm2835_spi_setBitOrder(1) # MSB First
+    BCM.bcm2835_spi_setDataMode(0) # CPOL = 0, CPHA = 0
+    BCM.bcm2835_spi_setClockDivider(128)
+    BCM.bcm2835_spi_chipSelect(cs)
+    BCM.bcm2835_spi_setChipSelectPolarity(cs, 0) # LOW
+    BCM.bcm2835_spi_transfernb(array, buffer, array.size)
+    BCM.bcm2835_spi_end
+    buffer
+  end
+
   module_function :write
+  module_function :read_write
 end
 
 if BCM.bcm2835_init.zero?
