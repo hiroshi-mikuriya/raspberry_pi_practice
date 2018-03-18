@@ -29,7 +29,11 @@ $ tar zxvf bcm2835-1.44.tar.gz
 $ cd bcm2835-1.44/  
 $ sudo ./configure  
 $ sudo make  
+$ cd src
+$ cc -shared bcm2835.o -o libbcm2835.so  
+$ cd ../
 $ sudo make install  
+$ sudo mv src/libbmc2835.so /usr/local/lib  
 $ sudo gem install bcm2835
 
 ## 参考URL
