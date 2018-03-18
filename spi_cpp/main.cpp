@@ -12,7 +12,6 @@ int main(int argv, char ** argc)
     for(;;) {
         std::string s;
         std::cin >> s;
-        transmit(s);
         bcm2835_spi_begin();
         bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);      // The default
         bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);                   // The default. Clock polarity = 0(Positive), Clock phase = 0(Positive)
