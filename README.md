@@ -20,6 +20,18 @@ SPI開通確認
 I2C開通確認  
 `sudo i2cdetect -y 1`
 
+bcm2835はRaspberryPiのIOを操作するライブラリ  
+rubyのgemも用意されている
+
+bcm2835のインストール  
+> $ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz  
+$ tar zxvf bcm2835-1.44.tar.gz  
+$ cd bcm2835-1.44/  
+$ sudo ./configure  
+$ sudo make  
+$ sudo make install  
+$ sudo gem install bcm2835
+
 ## 参考URL
 
 * Raspberry PIで温度湿度センサーをRubyで動かす  
@@ -30,9 +42,11 @@ https://blog.ymyzk.com/2015/02/enable-raspberry-pi-i2c/
 http://www.soramimi.jp/raspberrypi/spi/
 * Raspberry Pi ZeroをUSBケーブル1本で遊ぶ  
 https://www.raspi.jp/2016/07/pizero-usb-otg/
-* ラズベリーパイ】GPIOライブラリ｢pi_piper」のご紹介
+* ラズベリーパイ】GPIOライブラリ｢pi_piper」のご紹介  
 http://www.kibanhonpo.com/lab/pi_piper/
 * bcm2835 ライブラリによるスイッチ入力とLEDの点滅  
 https://tomosoft.jp/design/?p=5252
 * bcm2835.h  
 http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html
+* bcm2835(gem)  
+https://github.com/joshnuss/bcm2835
