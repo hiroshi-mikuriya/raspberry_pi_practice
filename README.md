@@ -1,49 +1,111 @@
-# Raspberry PiでSPIやI2Cを行う練習
+# セルフボール（Raspberry Pi）
 
-## やったこと
+## Raspberry Pi Zeroのセットアップ手順についての備忘録
 
+### OSインストールからSSHまで
+
+以下からOSをダウンロード  
+http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/
+
+現時点での最新を選ぶ  
+2018-03-13-raspbian-stretch.zip
+
+SDカードをMacBookに挿しこみ、EtcherでOSをSDカードに書き込む
+
+SDカードのルートに、sshという名前の空ファイルを置く（sshでログイン可能になる）
+
+USB-OTGで接続するために、以下２つのファイルを変更する
+* config.txt  
+  dtoverlay=dwc2を追記
+* cmdline.txt  
+  rootwait と quiet の間に modules-load=dwc2,g_ether を追記
+
+SDカードをRaspberry Pi Zeroに挿しこむ。  
+マイクロUSBケーブルでMacと繋ぐ。（2つあるUSBコネクタはPWRではなくUSBを選択）
+
+TODO: Macの初期設定をする（詳細はそのうち記述する）
+
+Macのターミナルから以下コマンドを入力するとSSHでログインできる。  
+`ssh pi@raspberrypi.local`  
+以前にも繋いだことがある場合に警告がでることがあるが、そのときはsudoで実行すればOK  
+
+### Wi-Fiにつなぐ
+
+以下コマンドを入力する（SSID PASSPHRASEは適切に設定すること）  
+`$ sudo sh -c 'wpa_passphrase SSID PASSPHRASE >> /etc/wpa_supplicant/wpa_supplicant.conf'`
+
+パスワードだけなぜかコメントアウトされているので、#を消す  
+`$ sudo vim /etc/wpa_supplicant/wpa_supplicant.conf'`
+
+これでWi-Fiにつながる。
+
+### FTP有効化
+
+`$ sudo apt-get upgrade && sudo apt-get update`  
+`$ sudo apt-get install vsftpd`  
+FTPは上記以降も設定があるので以下を参照のこと  
+http://yamaryu0508.hatenablog.com/entry/2014/12/02/102648
+
+### リモートデスクトップ有効化
+
+`$ sudo apt-get install xrdp`
+
+Macやwindowsのリモートデスクトップクライアントからアクセスする。  
+|key|value|
+|-|-|
+|URL|raspberrypi.local|
+|user|pi|
+|password|raspberry|
+
+### SPI有効化
+
+私はviよりvimのほうが使いやすいので、vimをインストールする  
+`$ sudo apt-get install vim`
+
+/etc/modules に追記  
+
+`snd-bcm2835`  
+`spidev`  
+
+コンフィグ画面でSPIを有効にする  
 `$ sudo raspi-config`  
 - 5 Interfacing Options  
 - P4 SPI -> enable  
 - P5 I2C -> enable  
 
-/etc/modules に追記（不要な項目もありそう）  
-
-snd-bcm2835  
-spidev  
-i2c-bcm2708  
-i2c-dev  
-spi_bcm2835
-
-
-ここでRaspberry Piを再起動する
-
 SPI開通確認  
 `ls -la /dev/spidev*`
 
-I2C開通確認  
-`sudo i2cdetect -y 1`
+結果  
+`crw-rw---- 1 root spi 153, 0 Mar 27 14:28 /dev/spidev0.0`  
+`crw-rw---- 1 root spi 153, 1 Mar 27 14:28 /dev/spidev0.1`
+
+### bcm2835をインストールする
 
 bcm2835はRaspberryPiのIOを操作するライブラリ  
-rubyのgem（Wrapper）も用意されているが、うまくインストールできなかったので諦めた。
 
-bcm2835のインストール  
+`$ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz`  
+`$ tar zxvf bcm2835-1.44.tar.gz`  
+`$ cd bcm2835-1.44/`  
+`$ sudo ./configure`  
+`$ sudo make`  
+`$ cd src`  
+`$ cc -shared bcm2835.o -o libbcm2835.so`  
+`$ cd ../`  
+`$ sudo make install`  
+`$ sudo mv src/libbcm2835.so /usr/local/lib`
 
-$ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz  
-$ tar zxvf bcm2835-1.44.tar.gz  
-$ cd bcm2835-1.44/  
-$ sudo ./configure  
-$ sudo make  
-$ cd src
-$ cc -shared bcm2835.o -o libbcm2835.so  
-$ cd ../
-$ sudo make install  
-$ sudo mv src/libbcm2835.so /usr/local/lib
+上記でbcm2835をso形式にしたのはFiddleを使ってRubyから直接呼び出すため。  
+bcm2835のgemもあるが、うまくインストールできなかったのでfiddleを使って操作することとした。
 
-上記でbcm2835をso形式にしたので、Fiddleを使ってRubyから直接呼び出せる。(bcm2835.rb < 自作)
+## Rubyプロセスをデーモン化する
 
-spi.rbは実際にSPI通信を行う例
+`$ sudo gem install daemons`
 
+require 'daemons'をして、Daemons.process内部に処理を記述すると、rubyがデーモンプロセスになる。
+さらにraspberry pi起動時に自動実行するには、/etc/rc.localにそのrubyを実行する処理を以下のように記述する。  
+`$ cd /home/pi/workspace/`  
+`$ sudo ruby main.rb start`
 
 ## 参考URL
 
