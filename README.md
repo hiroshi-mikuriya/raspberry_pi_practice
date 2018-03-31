@@ -1,4 +1,4 @@
-# セルフボール（Raspberry Pi）
+# Raspberry Pi Zeroであれこれ
 
 ## Raspberry Pi Zeroのセットアップ手順についての備忘録
 
