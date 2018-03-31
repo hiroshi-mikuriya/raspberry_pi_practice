@@ -125,3 +125,5 @@ https://tomosoft.jp/design/?p=5252
 http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html
 * bcm2835(gem)  
 https://github.com/joshnuss/bcm2835
+* Raspberry Pi で iBeacon を試してみよう！  
+https://www.eyemovic.com/works/4269.php
