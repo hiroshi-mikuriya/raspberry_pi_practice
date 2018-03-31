@@ -52,7 +52,7 @@ http://yamaryu0508.hatenablog.com/entry/2014/12/02/102648
 
 Macやwindowsのリモートデスクトップクライアントからアクセスする。  
 |key|value|
-|-|-|
+|---|---|
 |URL|raspberrypi.local|
 |user|pi|
 |password|raspberry|
