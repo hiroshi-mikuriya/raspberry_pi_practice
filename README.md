@@ -10,7 +10,7 @@ http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/
 現時点での最新を選ぶ  
 2018-03-13-raspbian-stretch.zip
 
-SDカードをMacBookに挿しこみ、EtcherでOSをSDカードに書き込む
+SDカードをMacBookに挿しこみ、EtcherでOSをSDカードに書き込む
 
 SDカードのルートに、sshという名前の空ファイルを置く（sshでログイン可能になる）
 
@@ -23,7 +23,7 @@ USB-OTGで接続するために、以下２つのファイルを変更する
 SDカードをRaspberry Pi Zeroに挿しこむ。  
 マイクロUSBケーブルでMacと繋ぐ。（2つあるUSBコネクタはPWRではなくUSBを選択）
 
-TODO: Macの初期設定をする（詳細はそのうち記述する）
+TODO: Macの初期設定をする（詳細はそのうち記述する）
 
 Macのターミナルから以下コマンドを入力するとSSHでログインできる。  
 `ssh pi@raspberrypi.local`  
@@ -42,7 +42,7 @@ Macのターミナルから以下コマンドを入力するとSSHでログイ�
 ### FTP有効化
 
 `$ sudo apt-get upgrade && sudo apt-get update`  
-`$ sudo apt-get install vsftpd`  
+`$ sudo apt-get install vsftpd`  
 FTPは上記以降も設定があるので以下を参照のこと  
 http://yamaryu0508.hatenablog.com/entry/2014/12/02/102648
 
@@ -103,7 +103,7 @@ bcm2835のgemもあるが、うまくインストールできなかったのでf
 `$ sudo gem install daemons`
 
 require 'daemons'をして、Daemons.process内部に処理を記述すると、rubyがデーモンプロセスになる。
-さらにraspberry pi起動時に自動実行するには、/etc/rc.localにそのrubyを実行する処理を以下のように記述する。  
+さらにraspberry pi起動時に自動実行するには、/etc/rc.localにそのrubyを実行する処理を以下のように記述する。  
 `$ cd /home/pi/workspace/`  
 `$ sudo ruby main.rb start`
 
@@ -128,7 +128,7 @@ https://github.com/joshnuss/bcm2835
 
 # Beacon
 
-Raspberry PiをBeaconにして何かする試み  
+Raspberry PiをBeaconにして何かする試み  
 
 ## Raspberry PiをBeaconにする
 
@@ -144,7 +144,7 @@ TODO: アドバタイジングパケットの構造について調査する
 `$ sudo hciconfig hci0 noleadv`
 
 またさらに、以下の方法でもBeacon化できるらしいが、こちらはうまくいかなかった。   
-`$ $ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git`  
+`$ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git`  
 `$ cd bluez-ibeacon/bluez-beacon/`  
 `$ sudo apt-get -y install libbluetooth-dev`  
 `$ make`  
@@ -152,7 +152,7 @@ TODO: アドバタイジングパケットの構造について調査する
 
 ## rssi値をスキャンする
 
-いちおうとれるけど、人間が目視するための文字列が返却されるし遅い。  
+いちおうとれるけど、人間が目視するための文字列が返却されるし遅い。  
 つまり100ms周期など頻繁にBeaconのrssiを計測することはできない。  
 また、アドバタイジングパケットの中身を見れない。
 
@@ -160,7 +160,7 @@ TODO: アドバタイジングパケットの構造について調査する
 
 ## bluez備忘録
 
-BlueZはオープンソースのBluetoothプロトコルスタックで、Linux上でBluetooth, BLEを扱う場合には標準的に使われているということだそう。  
+BlueZはオープンソースのBluetoothプロトコルスタックで、Linux上でBluetooth, BLEを扱う場合には標準的に使われているということだそう。  
 でも使い方わからない。
 
 `$ sudo apt-get update`  
