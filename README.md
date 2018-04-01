@@ -143,12 +143,14 @@ TODO: アドバタイジングパケットの構造について調査する
 ちなみにBeaconの止め方は以下。  
 `$ sudo hciconfig hci0 noleadv`
 
-またさらに、以下の方法でもBeacon化できるらしいが、こちらはうまくいかなかった。   
+またさらに上記とは別に、以下の方法でもBeacon化できる。   
 `$ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git`  
 `$ cd bluez-ibeacon/bluez-beacon/`  
 `$ sudo apt-get -y install libbluetooth-dev`  
 `$ make`  
 `$ sudo ./ibeacon 200 e2c56db5dffb48d2b060d0f5a71096e0 1 1 -29`
+
+UUID, Major, Minorの値をモニタリングするiOSアプリがあると嬉しいのだが。
 
 ## rssi値をスキャンする
 
