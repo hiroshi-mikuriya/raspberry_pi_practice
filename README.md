@@ -143,7 +143,7 @@ TODO: アドバタイジングパケットの構造について調査する
 ちなみにBeaconの止め方は以下。  
 `$ sudo hciconfig hci0 noleadv`
 
-またさらに上記とは別に、以下の方法でもBeacon化できる。   
+またさらに上記とは別に、以下の方法でもBeacon化できる。  
 `$ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git`  
 `$ cd bluez-ibeacon/bluez-beacon/`  
 `$ sudo apt-get -y install libbluetooth-dev`  
