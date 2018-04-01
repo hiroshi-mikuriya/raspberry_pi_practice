@@ -137,9 +137,6 @@ Raspberry PiをBeaconにして何かする試み
 `$ sudo hcitool -i hci0 cmd 0x08 0x0008 ${ADVERTISE}`  
 `$ sudo hciconfig hci0 leadv 3`
 
-上記手順にてiOSのnRFConnectというアプリで電波が出力されていることを確認した。  
-TODO: アドバタイジングパケットの構造について調査する
-
 ちなみにBeaconの止め方は以下。  
 `$ sudo hciconfig hci0 noleadv`
 
@@ -150,7 +147,7 @@ TODO: アドバタイジングパケットの構造について調査する
 `$ make`  
 `$ sudo ./ibeacon 200 e2c56db5dffb48d2b060d0f5a71096e0 1 1 -29`
 
-UUID, Major, Minorの値をモニタリングするiOSアプリがあると嬉しいのだが。
+iOS「Beacon入門」というアプリで UUID, Major, Minor, RSSI が計測できる。
 
 ## rssi値をスキャンする
 
