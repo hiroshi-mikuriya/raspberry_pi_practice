@@ -125,5 +125,64 @@ https://tomosoft.jp/design/?p=5252
 http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html
 * bcm2835(gem)  
 https://github.com/joshnuss/bcm2835
+
+# Beacon
+
+Raspberry PiをBeaconにして何かする試み  
+
+## Raspberry PiをBeaconにする
+
+`$ ADVERTISE="13 02 01 06 03 03 6F FE 0B 16 6F FE 02 01 DE AD BE EF 7F 00"`  
+`$ sudo hciconfig hci0 up`  
+`$ sudo hcitool -i hci0 cmd 0x08 0x0008 ${ADVERTISE_DATA}`  
+`$ sudo hciconfig hci0 leadv 3`
+
+上記手順にてiOSのnRFConnectというアプリで電波が出力されていることを確認した。  
+TODO: アドバタイジングパケットの構造について調査する
+
+ちなみにBeaconの止め方は以下。  
+`$ sudo hciconfig hci0 noleadv`
+
+またさらに、以下の方法でもBeacon化できるらしいが、こちらはうまくいかなかった。   
+`$ $ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git`  
+`$ cd bluez-ibeacon/bluez-beacon/`  
+`$ sudo apt-get -y install libbluetooth-dev`  
+`$ make`  
+`$ sudo ./ibeacon 200 e2c56db5dffb48d2b060d0f5a71096e0 1 1 -29`
+
+## rssi値をスキャンする
+
+いちおうとれるけど、人間が目視するための文字列が返却されるし遅い。
+アドバタイジングパケットの中身が見たい。
+
+`$ sudo btmon & sudo hcitool lescan`
+
+## bluez備忘録
+
+BlueZはオープンソースのBluetoothプロトコルスタックで、Linux上でBluetooth, BLEを扱う場合には標準的に使われているということだそう。  
+でも使い方わからない。
+
+`$ sudo apt-get update`  
+`$ sudo apt-get install libglib2.0-dev libdbus-1-dev libudev-dev  libical-dev libreadline6-dev`
+
+ダウンロードしてmake installする.  
+
+`$ wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.49.tar.xz`  
+`$ tar xvJf bluez-5.49.tar.xz`  
+`$ cd bluez-5.49`  
+`$ ./configure --disable-systemd --enable-library`  
+`$ make`  
+`$ sudo make install`
+
+
+## リンク
 * Raspberry Pi で iBeacon を試してみよう！  
 https://www.eyemovic.com/works/4269.php
+* Raspberry PiでiBeaconを検知する  
+https://qiita.com/katsuyoshi/items/9d5417495a47c4b15ac1
+* ラズベリーパイでLINE Beaconが作成可能に！「LINE Simple Beacon」仕様を公開しました  
+https://engineering.linecorp.com/ja/blog/detail/117
+* Raspberry PiをiBeacon化してみた。  
+https://jyun1.blogspot.jp/2013/12/i-beacon-make-by-raspberry-pi.html
+* Raspberry Pi 3でBluetoothデバイス接続  
+http://blog.akanumahiroaki.com/entry/2017/06/02/080000
