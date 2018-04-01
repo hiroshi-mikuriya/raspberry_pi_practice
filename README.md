@@ -134,7 +134,7 @@ Raspberry PiをBeaconにして何かする試み
 
 `$ ADVERTISE="13 02 01 06 03 03 6F FE 0B 16 6F FE 02 01 DE AD BE EF 7F 00"`  
 `$ sudo hciconfig hci0 up`  
-`$ sudo hcitool -i hci0 cmd 0x08 0x0008 ${ADVERTISE_DATA}`  
+`$ sudo hcitool -i hci0 cmd 0x08 0x0008 ${ADVERTISE}`  
 `$ sudo hciconfig hci0 leadv 3`
 
 上記手順にてiOSのnRFConnectというアプリで電波が出力されていることを確認した。  
@@ -152,8 +152,9 @@ TODO: アドバタイジングパケットの構造について調査する
 
 ## rssi値をスキャンする
 
-いちおうとれるけど、人間が目視するための文字列が返却されるし遅い。
-アドバタイジングパケットの中身が見たい。
+いちおうとれるけど、人間が目視するための文字列が返却されるし遅い。  
+つまり100ms周期など頻繁にBeaconのrssiを計測することはできない。  
+また、アドバタイジングパケットの中身を見れない。
 
 `$ sudo btmon & sudo hcitool lescan`
 
