@@ -145,7 +145,7 @@ Raspberry PiをBeaconにして何かする試み
 `$ cd bluez-ibeacon/bluez-beacon/`  
 `$ sudo apt-get -y install libbluetooth-dev`  
 `$ make`  
-`$ sudo ./ibeacon 200 e2c56db5dffb48d2b060d0f5a71096e0 1 1 -29`
+`$ sudo ./ibeacon 200 485344424c45414480c01800ffffffff 1 1 -29`
 
 iOS「Beacon入門」というアプリで UUID, Major, Minor, RSSI が計測できる。
 
