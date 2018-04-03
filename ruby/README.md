@@ -199,7 +199,7 @@ bleaconというライブラリをインストールして、Node.jsで以下を
 
 ```
 $ sudo apt-get install libbluetooth-dev
-$ sudo npm install bleacon
+$ npm install bleacon
 ```
 
 ```
