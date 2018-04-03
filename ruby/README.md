@@ -186,15 +186,6 @@ $ npm -v
 5.6.0
 ```
 
-と思ったら、肝心のbleaconがインストールできなかったので、nodejsのバージョンを0.10へ変更する
-
-```
-$ git clone git://github.com/creationix/nvm.git ~/.nvm
-$ source ~/.nvm/nvm.sh
-$ nvm install 0.11
-$ nvm use 0.11
-```
-
 bleaconというライブラリをインストールして、Node.jsで以下を実行する。  
 
 ```
