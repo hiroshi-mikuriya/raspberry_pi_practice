@@ -1,0 +1,24 @@
+@startuml Raspberry Piプロセス
+title Raspberry Piプロセス
+skinparam {
+  backgroundcolor AntiqueWhite
+  defaultFontName メイリオ
+  packageBackgroundColor #DDF
+}
+package PC as pc {
+  object "位置測位サーバー" as positioning
+}
+package "セルフボール" as selfball {
+  package "Raspberry Pi" as rp {
+    object "サーバー" as server
+    object "LED制御" as led
+    object "LCD制御" as lcd
+  }
+  object "FPGA" as fpga
+}
+positioning -> server : 現在状態通知（定期）
+server -> lcd : 状態変化あり
+led <- server : 状態変化ありのとき\nLED点灯色
+lcd -> fpga : まばたき指示（定期 or 状態変化あり）
+led -> fpga : LED点灯指示（頻繁）
+@enduml
