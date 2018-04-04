@@ -66,8 +66,10 @@ raspberry
 
 /etc/modules に追記  
 
-`snd-bcm2835`  
-`spidev`  
+```
+snd-bcm2835
+spidev
+```
 
 コンフィグ画面でSPIを有効にする  
 `$ sudo raspi-config`  
@@ -79,8 +81,11 @@ SPI開通確認
 `ls -la /dev/spidev*`
 
 結果  
-`crw-rw---- 1 root spi 153, 0 Mar 27 14:28 /dev/spidev0.0`  
-`crw-rw---- 1 root spi 153, 1 Mar 27 14:28 /dev/spidev0.1`
+
+```
+crw-rw---- 1 root spi 153, 0 Mar 27 14:28 /dev/spidev0.0
+crw-rw---- 1 root spi 153, 1 Mar 27 14:28 /dev/spidev0.1
+```
 
 ### bcm2835をインストールする
 
@@ -166,7 +171,10 @@ iOS「Beacon入門」というアプリで UUID, Major, Minor, RSSI が計測で
 
 `$ sudo btmon & sudo hcitool lescan`
 
-Node.jsを使ってモニタリングする方法があるらしい  
+## Node.js & bleacon
+
+上でいろいろと記述したが、bleaconを使えば、Beaconのアドバタイジングとモニタリングの両方ができる。  
+
 Node.jsのインストール  
 
 ```
@@ -190,16 +198,32 @@ bleaconというライブラリをインストールして、Node.jsで以下を
 
 ```
 $ sudo apt-get install libbluetooth-dev
-$ npm install bleacon
+$ npm install bleacon  # sudo をつけると失敗する
 ```
+
+モニタリングのソースは以下
 
 ```
 Bleacon = require('bleacon');
 Bleacon.startScanning();
+Bleacon.startScanning('b9407f30f5f8466eaff925556b57fe6d'); // downcase
 
 Bleacon.on('discover', function(bleacon) {
-   console.dir(bleacon);
+   console.log(bleacon);
 });
+```
+
+アドバタイジングのソースは以下
+
+```
+Bleacon = require('bleacon');
+
+var uuid = 'B9407F30F5F8466EAFF925556B57FE6D'; // upcase
+var major = 5;
+var minor = 99;
+var measuredPower = -59;
+
+Bleacon.startAdvertising(uuid, major, minor, measuredPower);
 ```
 
 ## bluez備忘録（今回不要）
