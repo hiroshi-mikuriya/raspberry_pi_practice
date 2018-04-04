@@ -153,7 +153,7 @@ $ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git
 $ cd bluez-ibeacon/bluez-beacon/
 $ sudo apt-get -y install libbluetooth-dev
 $ make
-$ sudo ./ibeacon 200 485344424c45414480c01800ffffffff 1 1 -29
+$ sudo ./ibeacon 200 B9407F30F5F8466EAFF925556B57FE6D 1 1 -29
 ```
 
 iOS「Beacon入門」というアプリで UUID, Major, Minor, RSSI が計測できる。
@@ -202,7 +202,7 @@ Bleacon.on('discover', function(bleacon) {
 });
 ```
 
-## bluez備忘録
+## bluez備忘録（今回不要）
 
 BlueZはオープンソースのBluetoothプロトコルスタックで、Linux上でBluetooth, BLEを扱う場合には標準的に使われているということだそう。  
 でも使い方わからない。
