@@ -51,11 +51,13 @@ http://yamaryu0508.hatenablog.com/entry/2014/12/02/102648
 `$ sudo apt-get install xrdp`
 
 Macやwindowsのリモートデスクトップクライアントからアクセスする。  
-|key|value|
-|---|---|
-|URL|raspberrypi.local|
-|user|pi|
-|password|raspberry|
+
+* URL  
+raspberrypi.local
+* user  
+pi
+* password  
+raspberry
 
 ### SPI有効化
 
@@ -84,16 +86,18 @@ SPI開通確認
 
 bcm2835はRaspberryPiのIOを操作するライブラリ  
 
-`$ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz`  
-`$ tar zxvf bcm2835-1.44.tar.gz`  
-`$ cd bcm2835-1.44/`  
-`$ sudo ./configure`  
-`$ sudo make`  
-`$ cd src`  
-`$ cc -shared bcm2835.o -o libbcm2835.so`  
-`$ cd ../`  
-`$ sudo make install`  
-`$ sudo mv src/libbcm2835.so /usr/local/lib`
+```
+$ sudo wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz
+$ tar zxvf bcm2835-1.44.tar.gz
+$ cd bcm2835-1.44/
+$ sudo ./configure
+$ sudo make
+$ cd src
+$ cc -shared bcm2835.o -o libbcm2835.so
+$ cd ../
+$ sudo make install
+$ sudo mv src/libbcm2835.so /usr/local/lib
+```
 
 上記でbcm2835をso形式にしたのはFiddleを使ってRubyから直接呼び出すため。  
 bcm2835のgemもあるが、うまくインストールできなかったのでfiddleを使って操作することとした。
@@ -132,20 +136,25 @@ Raspberry PiをBeaconにして何かする試み
 
 ## Raspberry PiをBeaconにする
 
-`$ ADVERTISE="13 02 01 06 03 03 6F FE 0B 16 6F FE 02 01 DE AD BE EF 7F 00"`  
-`$ sudo hciconfig hci0 up`  
-`$ sudo hcitool -i hci0 cmd 0x08 0x0008 ${ADVERTISE}`  
-`$ sudo hciconfig hci0 leadv 3`
+```
+$ ADVERTISE="13 02 01 06 03 03 6F FE 0B 16 6F FE 02 01 DE AD BE EF 7F 00"
+$ sudo hciconfig hci0 up
+$ sudo hcitool -i hci0 cmd 0x08 0x0008 ${ADVERTISE}
+$ sudo hciconfig hci0 leadv 3
+```
 
 ちなみにBeaconの止め方は以下。  
 `$ sudo hciconfig hci0 noleadv`
 
 またさらに上記とは別に、以下の方法でもBeacon化できる。  
-`$ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git`  
-`$ cd bluez-ibeacon/bluez-beacon/`  
-`$ sudo apt-get -y install libbluetooth-dev`  
-`$ make`  
-`$ sudo ./ibeacon 200 485344424c45414480c01800ffffffff 1 1 -29`
+
+```
+$ git clone https://github.com/carsonmcdonald/bluez-ibeacon.git
+$ cd bluez-ibeacon/bluez-beacon/
+$ sudo apt-get -y install libbluetooth-dev
+$ make
+$ sudo ./ibeacon 200 485344424c45414480c01800ffffffff 1 1 -29
+```
 
 iOS「Beacon入門」というアプリで UUID, Major, Minor, RSSI が計測できる。
 
@@ -157,6 +166,51 @@ iOS「Beacon入門」というアプリで UUID, Major, Minor, RSSI が計測で
 
 `$ sudo btmon & sudo hcitool lescan`
 
+## Bleacon
+
+Node.jsを使ってモニタリング&アドバタイズする方法があるらしい  
+Node.jsのインストール  
+
+```
+$ sudo apt-get update
+$ sudo apt-get install -y nodejs npm
+$ sudo npm cache clean
+$ sudo npm install npm n -g
+$ sudo n stable
+```
+
+インストール成功確認  
+
+```
+$ node -v
+v9.10.1
+$ npm -v
+5.6.0
+```
+
+bleaconをインストールする
+
+```
+$ sudo apt-get install libbluetooth-dev
+$ npm install bleacon # sudoを付与しないこと
+```
+
+Node.jsで以下を実行すると、Beaconのrssi計測とアドバタイズが同時に実行できる。便利。
+
+```
+Bleacon = require('bleacon');
+const uuid = 'b9407f30f5f8466eaff925556b57fe6d';
+const major = 3;
+const minor = 99;
+const measuredPower = -59;
+
+Bleacon.startScanning(uuid);
+Bleacon.on('discover', function(bleacon) {
+   console.log(JSON.stringify(bleacon));
+});
+Bleacon.startAdvertising(uuid, major, minor, measuredPower);
+```
+
 ## bluez備忘録
 
 BlueZはオープンソースのBluetoothプロトコルスタックで、Linux上でBluetooth, BLEを扱う場合には標準的に使われているということだそう。  
@@ -167,13 +221,14 @@ BlueZはオープンソースのBluetoothプロトコルスタックで、Linux�
 
 ダウンロードしてmake installする.  
 
-`$ wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.49.tar.xz`  
-`$ tar xvJf bluez-5.49.tar.xz`  
-`$ cd bluez-5.49`  
-`$ ./configure --disable-systemd --enable-library`  
-`$ make`  
-`$ sudo make install`
-
+```
+$ wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.49.tar.xz
+$ tar xvJf bluez-5.49.tar.xz
+$ cd bluez-5.49
+$ ./configure --disable-systemd --enable-library
+$ make
+$ sudo make install
+```
 
 ## リンク
 * Raspberry Pi で iBeacon を試してみよう！  
@@ -186,3 +241,11 @@ https://engineering.linecorp.com/ja/blog/detail/117
 https://jyun1.blogspot.jp/2013/12/i-beacon-make-by-raspberry-pi.html
 * Raspberry Pi 3でBluetoothデバイス接続  
 http://blog.akanumahiroaki.com/entry/2017/06/02/080000
+* iBeaconを利用したアプリ開発でチェックしておきたい！良記事・ソースコードまとめ  
+https://qiita.com/hedjirog/items/abd48a55387891cc8503
+* たった5行!最も簡単にiBeaconの電波を「受信」する方法  
+https://qiita.com/kpkpkp/items/c2899e548da1c5e2c28e
+* iBeaconを利用したアプリ開発について  
+https://www.webimpact.co.jp/banchoblog/?p=928
+* iBeaconのスキャナーを作ってみた  
+https://dev.classmethod.jp/smartphone/ibeacon-scanner2/
