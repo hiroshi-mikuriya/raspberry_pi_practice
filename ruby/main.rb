@@ -44,6 +44,5 @@ favorite = { modified: false, v: id }
   Thread.new { Led.new(led) },
   Thread.new { Lcd.new(lcd) },
   Thread.new { Server.new(favorite) },
-  Thread.new { BeaconMonitor.new(uuid, favorite, lcd, led) },
-  Thread.new { system("node beacon.js #{uuid.upcase} 5 #{id} -59") } # start advertising
+  Thread.new { BeaconMonitor.new(uuid, id, favorite, lcd, led) },
 ].each(&:join)

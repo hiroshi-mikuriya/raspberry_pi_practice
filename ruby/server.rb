@@ -5,26 +5,28 @@ require 'json'
 # Server thread
 class Server
   ##
-  # Waiting for receiving udp packet from positioning server.
-  private def polling_udp(favorite, udp)
-    d = udp.recv(65_535) # wait for receiving
+  # 
+  def impl(favorite)
+    s0 = TCPServer.open(4000)
+    socket = s0.accept
+    puts %(TCP socket is opened.)
+    d = socket.gets # wait for receiving
+    puts d
     v = JSON.parse(d, symbolize_names: true)
-    if v[:favorite] != favorite[:v]
+    if favorite[:v] != v[:favorite]
       favorite[:v] = v[:favorite] # TODO: archive favorite (JSON file)
       favorite[:modified] = true
     end
   rescue => e
     puts e
+  ensure
+    socket.close
+    s0.close
   end
 
   ##
   # @param favorite { modified: boolean, v: id }
   def initialize(favorite)
-    udp = UDPSocket.open # TODO: tcp
-    udp.bind('0.0.0.0', 4000)
-    puts %(UDP socket is opened.)
-    loop { polling_udp(favorite, udp) }
-  rescue => e
-    puts e
+    loop { impl(favorite) }
   end
 end

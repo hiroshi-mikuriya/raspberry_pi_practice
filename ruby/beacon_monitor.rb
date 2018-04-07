@@ -34,20 +34,20 @@ class BeaconMonitor
   def monitor_process(pid, favorite)
     loop do
       sleep(1)
-      if favorite[:modified]
-        favorite[:modified] = false
-        Process.kill('KILL', pid)
-        return
-      end
+      next unless favorite[:modified]
+      favorite[:modified] = false
+      Process.kill('KILL', pid)
+      return
     end
   end
 
   ##
   # @param uuid Beacon filtering uuid
+  # @param id selfball ID
   # @param favorite { modified: boolean, v: id }
   # @param lcd { modified: false }
   # @param led { modified: true, mutex: Mutex.new, v: [] }
-  def initialize(uuid, favorite, lcd, led)
+  def initialize(uuid, id, favorite, lcd, led)
     loop do
       @near = false
       cmd = ['node', 'beacon.js', uuid, id, favorite[:v], -59].join(' ')
