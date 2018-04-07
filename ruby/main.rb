@@ -36,13 +36,14 @@ if id.nil?
   exit 1
 end
 puts %(My id is #{id}.)
-uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').freeze
+uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze
 lcd = { modified: false }
 led = { modified: true, mutex: Mutex.new, v: [] }
+favorite = { modified: false, v: id }
 [
   Thread.new { Led.new(led) },
   Thread.new { Lcd.new(lcd) },
-  Thread.new { Server.new(id, lcd, led) },
-  Thread.new { BeaconMonitor.new(uuid.downcase, lcd, led) },
+  Thread.new { Server.new(favorite) },
+  Thread.new { BeaconMonitor.new(uuid, favorite, lcd, led) },
   Thread.new { system("node beacon.js #{uuid.upcase} 5 #{id} -59") } # start advertising
 ].each(&:join)

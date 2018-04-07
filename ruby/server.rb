@@ -6,29 +6,24 @@ require 'json'
 class Server
   ##
   # Waiting for receiving udp packet from positioning server.
-  private def polling_udp(udp, id, lcd, led)
+  private def polling_udp(favorite, udp)
     d = udp.recv(65_535) # wait for receiving
-    v = JSON.parse(d)[id]
-    led[:mutex].synchronize do
-      unless v == led[:v]
-        led[:v] = v
-        led[:modified] = true
-        lcd[:modified] = true
-      end
+    v = JSON.parse(d, symbolize_names: true)
+    if v[:favorite] != favorite[:v]
+      favorite[:v] = v[:favorite] # TODO: archive favorite (JSON file)
+      favorite[:modified] = true
     end
   rescue => e
     puts e
   end
 
   ##
-  # @param id Selfball ID
-  # @param lcd { modified: false }
-  # @param led { modified: true, mutex: Mutex.new, v: [] }
-  def initialize(id, lcd, led)
-    udp = UDPSocket.open
+  # @param favorite { modified: boolean, v: id }
+  def initialize(favorite)
+    udp = UDPSocket.open # TODO: tcp
     udp.bind('0.0.0.0', 4000)
     puts %(UDP socket is opened.)
-    loop { polling_udp(udp, id, lcd, led) }
+    loop { polling_udp(favorite, udp) }
   rescue => e
     puts e
   end
