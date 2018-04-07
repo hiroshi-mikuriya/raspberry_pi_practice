@@ -54,7 +54,7 @@ class BeaconMonitor
       Open3.popen3(cmd) do |_i, o, _e, w|
         puts "start beacon. PID: #{w.pid}"
         th = Thread.new { monitor_process(w.pid, favorite) }
-        o.each { |rssi| monitor_beacon rssi }
+        o.each { |rssi| monitor_beacon(rssi, lcd, led) }
         th.join
         puts 'end beacon.'
       end
