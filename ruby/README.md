@@ -121,7 +121,7 @@ net.ifnames=0
 
 再起動
 
-`sudo reboot now`
+`sudo reboot`
 
 ### SPI有効化
 
@@ -259,28 +259,19 @@ $ sudo apt-get install libbluetooth-dev
 $ npm install bleacon  # sudo をつけると失敗する
 ```
 
-モニタリングのソースは以下
+アドバタイジングとスキャンを両方行うソースコードは以下。
 
 ```
 Bleacon = require('bleacon');
-Bleacon.startScanning();
-Bleacon.startScanning('b9407f30f5f8466eaff925556b57fe6d'); // downcase
+const uuid = 'b9407f30f5f8466eaff925556b57fe6d';
+const major = 3;
+const minor = 99;
+const measuredPower = -59;
 
+Bleacon.startScanning(uuid);
 Bleacon.on('discover', function(bleacon) {
-   console.log(bleacon);
+   console.log(JSON.stringify(bleacon));
 });
-```
-
-アドバタイジングのソースは以下
-
-```
-Bleacon = require('bleacon');
-
-var uuid = 'B9407F30F5F8466EAFF925556B57FE6D'; // upcase
-var major = 5;
-var minor = 99;
-var measuredPower = -59;
-
 Bleacon.startAdvertising(uuid, major, minor, measuredPower);
 ```
 
