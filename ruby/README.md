@@ -5,20 +5,20 @@
 ### OSインストールからSSHまで
 
 以下からOSをダウンロード  
-http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/
+[RASPBIAN](https://www.raspberrypi.org/downloads/raspbian/)
 
 現時点での最新を選ぶ  
-2018-03-13-raspbian-stretch.zip
+RASPBIAN STRETCH LITE （xwindowsないかわりに高速起動するやつ）
 
-SDカードをMacBookに挿しこみ、EtcherでOSをSDカードに書き込む
-
+SDカードをMacBookに挿しこみ、EtcherでOSをSDカードに書き込む  
 SDカードのルートに、sshという名前の空ファイルを置く（sshでログイン可能になる）
 
 USB-OTGで接続するために、以下２つのファイルを変更する
-* config.txt  
-  dtoverlay=dwc2を追記
-* cmdline.txt  
-  rootwait と quiet の間に modules-load=dwc2,g_ether を追記
+
+|file|add|
+|:---|:---|
+|config.txt|dtoverlay=dwc2|
+|cmdline.txt|modules-load=dwc2,g_ether（rootwait と quiet の間）|
 
 SDカードをRaspberry Pi Zeroに挿しこむ。  
 マイクロUSBケーブルでMacと繋ぐ。（2つあるUSBコネクタはPWRではなくUSBを選択）
@@ -27,7 +27,7 @@ TODO: Macの初期設定をする（詳細はそのうち記述する）
 
 Macのターミナルから以下コマンドを入力するとSSHでログインできる。  
 `ssh pi@raspberrypi.local`  
-以前にも繋いだことがある場合に警告がでることがあるが、そのときはsudoで実行すればOK  
+以前にもRaspberryPiを繋いだことがあるとエラーが出ることがあるが、指示に従ってファイルを修正すれば大丈夫。
 
 ### Wi-Fiにつなぐ
 
@@ -52,12 +52,52 @@ http://yamaryu0508.hatenablog.com/entry/2014/12/02/102648
 
 Macやwindowsのリモートデスクトップクライアントからアクセスする。  
 
-* URL  
-raspberrypi.local
-* user  
-pi
-* password  
-raspberry
+|key|value|
+|:---|:---|
+|URL|raspberrypi.local|
+|user|pi|
+|password|raspberry|
+
+## 高速起動させる
+
+時間がかかっているサービスの一覧を表示する
+
+`$ systemd-analyze critical-chain`
+
+停止するサービス
+
+```
+sudo systemctl disable dphys-swapfile
+sudo systemctl disable keyboard-setup
+sudo systemctl disable triggerhappy
+```
+
+/boot/cmdline.txtから以下を削除
+
+`console=serial0,115200 console=tty1`
+
+以下のサービスを停止
+
+```
+sudo systemctl disable getty@tty1
+sudo systemctl disable hciuart
+```
+
+/boot/config.txtに以下を追加
+
+`force_turbo=1`
+
+固定IPにすると早いらしいが、DHCP使うならタイムアウトを設ける  
+/etc/systemd/system/dhcpcd.service.d/wait.conf
+
+```
+[Service]
+ExecStart=
+ExecStart=/sbin/dhcpcd -q -w -t 5     #タイムアウトを追記
+```
+
+これにより、raspberry pi zero上でraspbian strech liteが22秒で起動した。
+頑張れば8.3秒で起動できるらしい。SDカードのクラスも重要っぽい。
 
 ### SPI有効化
 
@@ -118,22 +158,16 @@ require 'daemons'をして、Daemons.process内部に処理を記述すると、
 
 ## 参考URL
 
-* Raspberry PIで温度湿度センサーをRubyで動かす  
-https://qiita.com/cattaka/items/43745dde59e7f2b4988d  
-* Raspberry Pi の I2C を有効化する方法 (2015年版)  
-https://blog.ymyzk.com/2015/02/enable-raspberry-pi-i2c/
-* Raspberry PiでSPI通信機能を利用する（NTP時計を無線LAN化する）  
-http://www.soramimi.jp/raspberrypi/spi/
-* Raspberry Pi ZeroをUSBケーブル1本で遊ぶ  
-https://www.raspi.jp/2016/07/pizero-usb-otg/
-* ラズベリーパイ】GPIOライブラリ｢pi_piper」のご紹介  
-http://www.kibanhonpo.com/lab/pi_piper/
-* bcm2835 ライブラリによるスイッチ入力とLEDの点滅  
-https://tomosoft.jp/design/?p=5252
-* bcm2835.h  
-http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html
-* bcm2835(gem)  
-https://github.com/joshnuss/bcm2835
+* [Raspberry PIで温度湿度センサーをRubyで動かす](https://qiita.com/cattaka/items/43745dde59e7f2b4988d)
+* [Raspberry Pi の I2C を有効化する方法 (2015年版)](https://blog.ymyzk.com/2015/02/enable-raspberry-pi-i2c/)
+* [Raspberry PiでSPI通信機能を利用する（NTP時計を無線LAN化する）](http://www.soramimi.jp/raspberrypi/spi/)
+* [Raspberry Pi ZeroをUSBケーブル1本で遊ぶ](https://www.raspi.jp/2016/07/pizero-usb-otg/)
+* [ラズベリーパイ】GPIOライブラリ｢pi_piper」のご紹介](http://www.kibanhonpo.com/lab/pi_piper/)
+* [bcm2835 ライブラリによるスイッチ入力とLEDの点滅](https://tomosoft.jp/design/?p=5252)
+* [bcm2835.h](http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html)
+* [bcm2835(gem)](https://github.com/joshnuss/bcm2835)
+* [Raspberry Pi Zeroを10秒以内で高速起動する最も簡単な方法](http://nw-electric.way-nifty.com/blog/2017/04/raspberry-pi-ze.html)
+
 
 # Beacon
 
@@ -246,21 +280,12 @@ $ sudo make install
 ```
 
 ## リンク
-* Raspberry Pi で iBeacon を試してみよう！  
-https://www.eyemovic.com/works/4269.php
-* Raspberry PiでiBeaconを検知する  
-https://qiita.com/katsuyoshi/items/9d5417495a47c4b15ac1
-* ラズベリーパイでLINE Beaconが作成可能に！「LINE Simple Beacon」仕様を公開しました  
-https://engineering.linecorp.com/ja/blog/detail/117
-* Raspberry PiをiBeacon化してみた。  
-https://jyun1.blogspot.jp/2013/12/i-beacon-make-by-raspberry-pi.html
-* Raspberry Pi 3でBluetoothデバイス接続  
-http://blog.akanumahiroaki.com/entry/2017/06/02/080000
-* iBeaconを利用したアプリ開発でチェックしておきたい！良記事・ソースコードまとめ  
-https://qiita.com/hedjirog/items/abd48a55387891cc8503
-* たった5行!最も簡単にiBeaconの電波を「受信」する方法  
-https://qiita.com/kpkpkp/items/c2899e548da1c5e2c28e
-* iBeaconを利用したアプリ開発について  
-https://www.webimpact.co.jp/banchoblog/?p=928
-* iBeaconのスキャナーを作ってみた  
-https://dev.classmethod.jp/smartphone/ibeacon-scanner2/
+* [Raspberry Pi で iBeacon を試してみよう！](https://www.eyemovic.com/works/4269.php)
+* [Raspberry PiでiBeaconを検知する](https://qiita.com/katsuyoshi/items/9d5417495a47c4b15ac1)
+* [ラズベリーパイでLINE Beaconが作成可能に！「LINE Simple Beacon」仕様を公開しました](https://engineering.linecorp.com/ja/blog/detail/117)
+* [Raspberry PiをiBeacon化してみた。](https://jyun1.blogspot.jp/2013/12/i-beacon-make-by-raspberry-pi.html)
+* [Raspberry Pi 3でBluetoothデバイス接続](http://blog.akanumahiroaki.com/entry/2017/06/02/080000)
+* [iBeaconを利用したアプリ開発でチェックしておきたい！良記事・ソースコードまとめ](https://qiita.com/hedjirog/items/abd48a55387891cc8503)
+* [たった5行!最も簡単にiBeaconの電波を「受信」する方法](https://qiita.com/kpkpkp/items/c2899e548da1c5e2c28e)
+* [iBeaconを利用したアプリ開発について](https://www.webimpact.co.jp/banchoblog/?p=928)
+* [iBeaconのスキャナーを作ってみた](https://dev.classmethod.jp/smartphone/ibeacon-scanner2/)

@@ -10,7 +10,8 @@ require 'thread'
 MAC2ID = {
   'b8:27:eb:ef:87:62' => '1',
   'b8:27:eb:21:2b:6c' => '2',
-  'b8:27:eb:85:07:7f' => '3' # TODO: add more 17 selfballs
+  'b8:27:eb:85:07:7f' => '3',
+  'b8:27:eb:27:35:22' => '4' # TODO: add more 16 selfballs
 }.freeze
 
 ##

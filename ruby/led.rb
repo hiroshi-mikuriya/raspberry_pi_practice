@@ -82,5 +82,4 @@ class Led
       [2, [0x1000].pack('n*').unpack('C*'), [r, g, b] * 32 * brightness].flatten.pack('c*')
     end
   end
-
 end
