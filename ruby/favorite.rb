@@ -8,10 +8,10 @@ module FAVORITE
   def read
     v = 0
     File.open(PATH, 'r') { |f| v = JSON.parse(f.read, symbolize_names: true)[:v] }
+    v
   rescue
     puts 'create initial file.'
     write(v)
-  ensure
     v
   end
 
