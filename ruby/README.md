@@ -99,6 +99,28 @@ ExecStart=/sbin/dhcpcd -q -w -t 5     #タイムアウトを追記
 これにより、raspberry pi zero上でraspbian strech liteが22秒で起動した。
 頑張れば8.3秒で起動できるらしい。SDカードのクラスも重要っぽい。
 
+### 固定IPにする
+
+`sudo vim /etc/dhcpcd.conf`
+
+Wi-Fiの場合、以下のように書き換える
+
+```
+interface wlan0
+static ip_address=192.168.11.201
+static routers=192.168.11.1
+```
+
+cmdline.txtに追記
+
+`sudo vim /boot/cmdline.txt`
+
+net.ifnames=0
+
+再起動
+
+`sudo reboot now`
+
 ### SPI有効化
 
 私はviよりvimのほうが使いやすいので、vimをインストールする  
