@@ -115,7 +115,9 @@ cmdline.txtに追記
 
 `sudo vim /boot/cmdline.txt`
 
+```
 net.ifnames=0
+```
 
 再起動
 
