@@ -1,9 +1,12 @@
+require './favorite'
 require 'socket'
 require 'json'
 
 ##
 # Server thread
 class Server
+  PATH = 'favorite.json'.freeze
+
   ##
   # 
   def impl(favorite)
@@ -14,7 +17,9 @@ class Server
     puts d
     v = JSON.parse(d, symbolize_names: true)
     if favorite[:v] != v[:favorite]
-      favorite[:v] = v[:favorite] # TODO: archive favorite (JSON file)
+      favorite[:v] = v[:favorite]
+      FAVORITE.write(favorite[:v])
+      puts "favorite : #{favorite[:v]}"
       favorite[:modified] = true
     end
   rescue => e
@@ -27,6 +32,7 @@ class Server
   ##
   # @param favorite { modified: boolean, v: id }
   def initialize(favorite)
+    puts "favorite : #{favorite[:v]}"
     loop { impl(favorite) }
   end
 end

@@ -3,6 +3,7 @@ require './lcd'
 require './server'
 require './beacon_monitor'
 require './bcm2835'
+require './favorite'
 require 'thread'
 
 ##
@@ -40,7 +41,7 @@ puts %(My id is #{id}.)
 uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze
 lcd = { modified: false }
 led = { modified: true, mutex: Mutex.new, v: [] }
-favorite = { modified: false, v: id }
+favorite = { modified: false, v: FAVORITE.read }
 [
   Thread.new { Led.new(led) },
   Thread.new { Lcd.new(lcd) },
