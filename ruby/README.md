@@ -261,7 +261,7 @@ $ npm install bleacon  # sudo をつけると失敗する
 
 アドバタイジングとスキャンを両方行うソースコードは以下。
 
-```
+```js:beacon.js
 Bleacon = require('bleacon');
 const uuid = 'b9407f30f5f8466eaff925556b57fe6d';
 const major = 3;
