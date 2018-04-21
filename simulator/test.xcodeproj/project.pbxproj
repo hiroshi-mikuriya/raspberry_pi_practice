@@ -8,10 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		68026952208B689100AF983B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68026951208B689100AF983B /* main.cpp */; };
-		68A4063A208B6CA800C19869 /* libsimulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A40638208B6C7C00C19869 /* libsimulator.a */; };
-		68A40698208B6E5300C19869 /* libopencv_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A40695208B6E5300C19869 /* libopencv_core.dylib */; };
-		68A40699208B6E5300C19869 /* libopencv_highgui.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A40696208B6E5300C19869 /* libopencv_highgui.dylib */; };
-		68A4069A208B6E5300C19869 /* libopencv_imgproc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A40697208B6E5300C19869 /* libopencv_imgproc.dylib */; };
+		68A4063A208B6CA800C19869 /* libsimulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A40638208B6C7C00C19869 /* libsimulator.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,10 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68A4063A208B6CA800C19869 /* libsimulator.a in Frameworks */,
-				68A40698208B6E5300C19869 /* libopencv_core.dylib in Frameworks */,
-				68A40699208B6E5300C19869 /* libopencv_highgui.dylib in Frameworks */,
-				68A4069A208B6E5300C19869 /* libopencv_imgproc.dylib in Frameworks */,
+				68A4063A208B6CA800C19869 /* libsimulator.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,7 +83,7 @@
 		68A40634208B6C7C00C19869 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				68A40638208B6C7C00C19869 /* libsimulator.a */,
+				68A40638208B6C7C00C19869 /* libsimulator.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,10 +156,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		68A40638208B6C7C00C19869 /* libsimulator.a */ = {
+		68A40638208B6C7C00C19869 /* libsimulator.dylib */ = {
 			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libsimulator.a;
+			fileType = "compiled.mach-o.dylib";
+			path = libsimulator.dylib;
 			remoteRef = 68A40637208B6C7C00C19869 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};

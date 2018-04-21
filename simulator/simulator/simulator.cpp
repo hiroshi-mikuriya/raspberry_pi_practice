@@ -1,12 +1,13 @@
 #include <opencv2/opencv.hpp>
 
 namespace {
-    const float inner = 100;
-    const float outer = inner + 5;
-    const float light = 2;
-    const cv::Size canvas_size(250, 250);
+    const float inner = 230;
+    const float outer = inner + 10;
+    const float light = 5;
+    const cv::Size canvas_size(500, 500);
 }
 
+extern "C"
 void write(unsigned char const * pkt, int cs)
 {
     cv::Mat canvas = cv::Mat::zeros(canvas_size, CV_8UC3);
