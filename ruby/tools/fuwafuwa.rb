@@ -5,18 +5,6 @@ if BCM.bcm2835_init.zero?
   exit 1
 end
 
-SPI.write(packet('clear'), SPI::CS0) # clear all
-
-ARGV.each do |color|
-  begin_time = Time.now
-  loop do
-    t = Time.now - begin_time
-    break if t > 2
-    pow = [(Math.sin(t * Math::PI) * 128) + 128, 255].min
-    SPI.write(packet(color, pow), SPI::CS0)
-  end
-end
-
 ##
 # Make packet for lighting led.
 def packet(color_name, pow)
@@ -39,4 +27,17 @@ def rgb(pow)
   brightness = pow[:brightness] || 2
   brightness = [4, brightness].min unless [r, g, b].all?(&:zero?) # limitter(fool proof)
   [2, [0x1000].pack('n*').unpack('C*'), [r, g, b] * 32 * brightness].flatten.pack('c*')
+end
+
+SPI.write(packet('clear', 8), SPI::CS0) # clear all
+
+ARGV.each do |color|
+  begin_time = Time.now
+  loop do
+    t = Time.now - begin_time
+    break if t > 2
+    pow = [(Math.sin(t * Math::PI) * 128) + 128, 255].min
+    SPI.write(packet(color, pow), SPI::CS0)
+    sleep(0.033)
+  end
 end
