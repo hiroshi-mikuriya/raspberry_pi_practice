@@ -1,6 +1,6 @@
 require 'socket'
 require 'json'
 
-sock = TCPSocket.open('192.168.2.44', 4000)
-sock.write({ favorite: 0xFFFF }.to_json)
+sock = TCPSocket.open('169.254.205.61', 4001)
+sock.write({ colors: %w[aqua yellow green], interval: 10 }.to_json)
 sock.close

@@ -12,7 +12,7 @@ def packet(color_name, pow)
   when 'red' then rgb(r: pow)
   when 'blue' then rgb(b: pow)
   when 'green' then rgb(g: pow)
-  when 'yellow' then rgb(r: pow, g: pow)
+  when 'yellow' then rgb(r: pow, g: pow * 0.6)
   when 'aqua' then rgb(g: pow, b: pow)
   when 'pink' then rgb(b: pow, r: pow)
   else rgb(brightness: 8)
@@ -34,9 +34,9 @@ SPI.write(packet('clear', 8), SPI::CS0) # clear all
 ARGV.each do |color|
   begin_time = Time.now
   loop do
-    t = Time.now - begin_time
-    break if t >= 2
-    pow = [(Math.sin(t * Math::PI) * 128) + 128, 255].min
+    a = (Time.now - begin_time) * Math::PI
+    break if a >= 2 * Math::PI
+    pow = (-Math.cos(a) + 1) / 2 * 255
     SPI.write(packet(color, pow), SPI::CS0)
   end
 end

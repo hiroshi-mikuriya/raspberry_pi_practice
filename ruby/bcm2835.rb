@@ -5,6 +5,7 @@ require 'fiddle/import'
 module BCM
   extend Fiddle::Importer
   dlload '/usr/local/lib/libbcm2835.so'
+  # dlload './tools/libsimulator.dylib'
   extern 'int bcm2835_init(void)'
   extern 'int bcm2835_close(void)'
   extern 'void  bcm2835_set_debug(unsigned char debug)'

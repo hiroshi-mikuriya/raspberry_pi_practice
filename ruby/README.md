@@ -1,5 +1,22 @@
 # セルフボール（Raspberry Pi）
 
+## 起動関係
+
+/etc/rc.local に以下を記述し、いくつかのプロセスを自動起動する
+
+```
+cd /home/pi/workspace/
+sudo ruby main.rb >> selfball.log &
+ruby favorite_server.rb &
+sudo ruby mod_static_ip.rb &
+```
+
+|file|detail|
+|:---|:---|
+|main.rb|趣味趣向の設定を受け付ける</br>LED, LCDを制御する</br>Beaconの発信、計測をする|
+|favorite_server.rb|現在設定されている趣味趣向を取得する|
+|mod_static_ip.rb|固定IPの値を適切（ユニーク）に設定する|
+
 ## Raspberry Pi Zeroのセットアップ手順についての備忘録
 
 ### OSインストールからSSHまで
@@ -35,7 +52,7 @@ Macのターミナルから以下コマンドを入力するとSSHでログイ�
 `$ sudo sh -c 'wpa_passphrase SSID PASSPHRASE >> /etc/wpa_supplicant/wpa_supplicant.conf'`
 
 パスワードだけなぜかコメントアウトされているので、#を消す  
-`$ sudo vim /etc/wpa_supplicant/wpa_supplicant.conf'`
+`$ sudo vim /etc/wpa_supplicant/wpa_supplicant.conf`
 
 これでWi-Fiにつながる。
 
@@ -180,6 +197,12 @@ require 'daemons'をして、Daemons.process内部に処理を記述すると、
 `$ cd /home/pi/workspace/`  
 `$ sudo ruby main.rb start`
 
+## SDカードバックアップ
+
+```
+$ sudo dd if=/dev/disk2 | gzip > backup`date +%Y%m%d`.img.gz
+```
+
 ## 参考URL
 
 * [Raspberry PIで温度湿度センサーをRubyで動かす](https://qiita.com/cattaka/items/43745dde59e7f2b4988d)
@@ -191,7 +214,7 @@ require 'daemons'をして、Daemons.process内部に処理を記述すると、
 * [bcm2835.h](http://www.airspayce.com/mikem/bcm2835/bcm2835_8h_source.html)
 * [bcm2835(gem)](https://github.com/joshnuss/bcm2835)
 * [Raspberry Pi Zeroを10秒以内で高速起動する最も簡単な方法](http://nw-electric.way-nifty.com/blog/2017/04/raspberry-pi-ze.html)
-
+* [Raspberry Piでプログラムを自動起動する5種類の方法を比較・解説](http://hendigi.karaage.xyz/2016/11/auto-boot/)
 
 # Beacon
 

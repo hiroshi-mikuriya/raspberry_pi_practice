@@ -10,7 +10,7 @@ def rgb(name, pow)
   when 'red' then [pow, 0, 0]
   when 'green' then [0, pow, 0]
   when 'blue' then [0, 0, pow]
-  when 'yellow' then [pow, pow, 0]
+  when 'yellow' then [pow, pow * 0.6, 0]
   when 'aqua' then [0, pow, pow]
   when 'pink' then [pow, 0, pow]
   when 'white' then [pow, pow, pow]
@@ -18,26 +18,21 @@ def rgb(name, pow)
   end
 end
 
-def packet(color, pos, pow)
-  colors = Array.new(16) { 'clear' }
-  colors[pos] = color
+def packet(colors, pow)
   a = colors.map { |name| rgb(name, pow) }
   # [2, [0x1000].pack('n*').unpack('C*'), [r, g, b] * 32 * brightness].flatten.pack('c*')
   brightness = 2
   [2, [0x1000].pack('n*').unpack('C*'), a * 2 * brightness].flatten.pack('c*')
 end
-SPI.write(packet('clear', 0, 0), SPI::CS0) # clear all
+SPI.write(packet(['clear'] * 16, 8), SPI::CS0) # clear all
 
-ARGV.each do |color|
-  begin_time = Time.now
-  loop do
-    t = Time.now - begin_time
-    break if t >= 3
-    16.times do |pos|
-      # pow = [(Math.sin(t * Math::PI) * 128) + 128, 255].min
-      pow = 255
-      SPI.write(packet(color, pos, pow), SPI::CS0)
-      sleep(0.02)
-    end
-  end
+colors = ARGV.to_a
+p colors = (ARGV.to_a * 16).take(16)
+
+begin_time = Time.now
+loop do
+  t = Time.now - begin_time
+  break if t >= 10
+  pow = (-Math.cos(t * Math::PI) + 1) / 2 * 255
+  SPI.write(packet(colors, pow), SPI::CS0)
 end

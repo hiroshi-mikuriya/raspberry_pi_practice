@@ -1,38 +1,34 @@
-require './favorite'
 require 'socket'
 require 'json'
 
 ##
 # Server thread
 class Server
-  PATH = 'favorite.json'.freeze
+  ##
+  # @param led {:modified, :mutex, :colors, :interval}
+  # @param lcd {:modified, :error}
+  def initialize(led, lcd)
+    loop { impl(led, lcd) }
+  end
 
   ##
-  # 
-  def impl(favorite)
-    s0 = TCPServer.open(4000)
-    socket = s0.accept
+  # @param led {:modified, :mutex, :colors, :interval}
+  # @param lcd {:modified, :error}
+  private def impl(led, lcd)
+    s0 = TCPServer.open(4001)
     puts %(TCP socket is opened.)
+    socket = s0.accept
     d = socket.gets # wait for receiving
     puts d
     v = JSON.parse(d, symbolize_names: true)
-    if favorite[:v] != v[:favorite]
-      favorite[:v] = v[:favorite]
-      FAVORITE.write(favorite[:v])
-      puts "favorite : #{favorite[:v]}"
-      favorite[:modified] = true
+    led[:mutex].synchronize do
+      lcd[:modified] = true unless lcd[:error]
+      %i[colors interval].each { |s| led[s] = v[s] }
     end
   rescue => e
     puts e
   ensure
     socket.close
     s0.close
-  end
-
-  ##
-  # @param favorite { modified: boolean, v: id }
-  def initialize(favorite)
-    puts "favorite : #{favorite[:v]}"
-    loop { impl(favorite) }
   end
 end
