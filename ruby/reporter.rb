@@ -1,4 +1,3 @@
-require 'json'
 require 'httpclient'
 
 ##
@@ -7,21 +6,17 @@ class Reporter
   TIME_LIMIT = 2 # [sec]
 
   ##
+  # @param id my selfball id
   # @param beacon_logs { v: { beacon: [:time, :accuracy] }, mutex: Mutex }
   # @param lcd { modified: false, error: false }
-  def initialize(beacon_logs, lcd)
+  def initialize(id, beacon_logs, lcd)
     loop do
-      beacons = []
-      beacon_logs[:mutex].synchronize do
-        remove_old_data beacon_logs[:v]
-        beacon_logs[:v].each do |beacon, logs|
-          beacons.push beacon if logs.size > 5
-        end
-      end
       begin
-        send_report(beacons)
+        beacons = closed_beacons(beacon_logs)
+        send_report(me: id, friends: beacons)
         lcd[:error] = false
-      rescue
+      rescue => e
+        puts e
         lcd[:error] = true
       end
       sleep(1)
@@ -29,8 +24,22 @@ class Reporter
   end
 
   ##
+  # get closed beacons from beacon logs.
+  # @param beacon_logs
+  private def closed_beacons(beacon_logs)
+    beacons = []
+    beacon_logs[:mutex].synchronize do
+      remove_old_data beacon_logs[:v]
+      beacon_logs[:v].each do |beacon, logs|
+        beacons.push beacon if logs.size > 5
+      end
+    end
+    beacons
+  end
+
+  ##
   # @param beacons { beacon: [:time, :accuracy] }
-  def remove_old_data(beacons)
+  private def remove_old_data(beacons)
     now = Time.now
     beacons.keys.each do |beacon|
       logs = beacons[beacon] # [Log, Log, ...]
@@ -48,8 +57,10 @@ class Reporter
 
   ##
   # send closed beacons to God
-  def send_report(data)
-    # p({ beacons: data }.to_json)
+  private def send_report(data)
+    client = HTTPClient.new
+    res = client.post('http://192.168.11.2:4567/closed_beacons', data)
+    p res
   end
 end
 
@@ -57,5 +68,6 @@ if $0 == __FILE__
   default_logs = Hash.new { |h, k| h[k] = [] }
   beacon_logs = Struct.new(:v, :mutex).new(default_logs, Mutex.new)
   lcd = Struct.new(:modified, :error).new(false, false)
-  Reporter.new(beacon_logs, lcd)
+  id = 6
+  Reporter.new(id, beacon_logs, lcd)
 end
