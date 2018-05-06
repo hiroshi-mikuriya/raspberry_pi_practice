@@ -27,6 +27,6 @@ beacon_logs = Struct.new(:v, :mutex).new(default_logs, Mutex.new)
   Thread.new { Led.new(led) },
   Thread.new { Lcd.new(lcd) },
   Thread.new { Beacon.new(uuid, id, beacon_logs) },
-  Thread.new { Reporter.new(beacon_logs, lcd) },
+  Thread.new { Reporter.new(id, beacon_logs, lcd) },
   Thread.new { Server.new(led, lcd) }
 ].each(&:join)

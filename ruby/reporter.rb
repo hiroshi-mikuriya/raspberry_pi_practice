@@ -25,8 +25,7 @@ class Reporter
     beacons = closed_beacons(beacon_logs)
     send_report(me: id, friends: beacons)
     lcd[:error] = false
-  rescue => e
-    puts %(exception : #{e})
+  rescue
     lcd[:error] = true
   end
 
@@ -46,30 +45,20 @@ class Reporter
   # @param beacons { beacon: [:time, :accuracy] }
   private def remove_old_data(beacons)
     now = Time.now
-    beacons.each_key do |beacon|
-      logs = beacons[beacon] # [Log, Log, ...]
-      loop do
-        if logs.empty?
-          beacons.delete(beacon)
-          break
-        end
-        log = logs.first
-        break if now - log[:time] < TIME_LIMIT
-        logs.shift
-      end
+    beacons.each_key do |_, logs|
+      logs.shift until logs.empty? || now - logs.first[:time] < TIME_LIMIT
     end
   end
 
   ##
   # send closed beacons to God
   private def send_report(data)
-    p data
-    client = HTTPClient.new
-    client.connect_timeout = 5
-    client.send_timeout = 5
-    client.receive_timeout = 5
-    res = client.post('http://192.168.11.2:4567/report', data)
-    p %(responce : #{res})
+    HTTPClient.new do |c|
+      c.connect_timeout = 5
+      c.send_timeout = 5
+      c.receive_timeout = 5
+      c.post('http://192.168.11.2:4567/report', data)
+    end
   end
 end
 
