@@ -42,7 +42,7 @@ class Reporter
   end
 
   ##
-  # @param beacons { beacon: [:time, :accuracy] }
+  # @param beacons { beacon: [(:time, :accuracy), ...] }
   private def remove_old_data(beacons)
     now = Time.now
     beacons.each_key do |_, logs|

@@ -14,7 +14,6 @@ sudo ruby mod_static_ip.rb &
 |file|detail|
 |:---|:---|
 |main.rb|趣味趣向の設定を受け付ける</br>LED, LCDを制御する</br>Beaconの発信、計測をする|
-|favorite_server.rb|現在設定されている趣味趣向を取得する|
 |mod_static_ip.rb|固定IPの値を適切（ユニーク）に設定する|
 
 ## Raspberry Pi Zeroのセットアップ手順についての備忘録
