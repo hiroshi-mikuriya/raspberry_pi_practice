@@ -11,37 +11,42 @@ class Reporter
   # @param lcd { modified: false, error: false }
   def initialize(id, beacon_logs, lcd)
     loop do
-      begin
-        beacons = closed_beacons(beacon_logs)
-        send_report(me: id, friends: beacons)
-        lcd[:error] = false
-      rescue => e
-        puts e
-        lcd[:error] = true
-      end
+      loop_inner_proc(id, beacon_logs, lcd)
       sleep(1)
     end
+  end
+
+  ##
+  # called by Reporter.initialize
+  # @param id my selfball id
+  # @param beacon_logs { v: { beacon: [:time, :accuracy] }, mutex: Mutex }
+  # @param lcd { modified: false, error: false }
+  private def loop_inner_proc(id, beacon_logs, lcd)
+    beacons = closed_beacons(beacon_logs)
+    send_report(me: id, friends: beacons)
+    lcd[:error] = false
+  rescue => e
+    puts %(exception : #{e})
+    lcd[:error] = true
   end
 
   ##
   # get closed beacons from beacon logs.
   # @param beacon_logs
   private def closed_beacons(beacon_logs)
-    beacons = []
     beacon_logs[:mutex].synchronize do
       remove_old_data beacon_logs[:v]
-      beacon_logs[:v].each do |beacon, logs|
-        beacons.push beacon if logs.size > 5
+      return beacon_logs[:v].each.with_object([]) do |(beacon, logs), o|
+        o.push beacon if logs.size > 5
       end
     end
-    beacons
   end
 
   ##
   # @param beacons { beacon: [:time, :accuracy] }
   private def remove_old_data(beacons)
     now = Time.now
-    beacons.keys.each do |beacon|
+    beacons.each_key do |beacon|
       logs = beacons[beacon] # [Log, Log, ...]
       loop do
         if logs.empty?
@@ -58,9 +63,13 @@ class Reporter
   ##
   # send closed beacons to God
   private def send_report(data)
+    p data
     client = HTTPClient.new
+    client.connect_timeout = 5
+    client.send_timeout = 5
+    client.receive_timeout = 5
     res = client.post('http://192.168.11.2:4567/closed_beacons', data)
-    p res
+    p %(responce : #{res})
   end
 end
 
