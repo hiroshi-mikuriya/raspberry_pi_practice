@@ -68,7 +68,7 @@ class Reporter
     client.connect_timeout = 5
     client.send_timeout = 5
     client.receive_timeout = 5
-    res = client.post('http://192.168.11.2:4567/closed_beacons', data)
+    res = client.post('http://192.168.11.2:4567/report', data)
     p %(responce : #{res})
   end
 end
