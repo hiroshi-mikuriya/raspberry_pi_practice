@@ -1,4 +1,4 @@
-require './bcm2835'
+require '../bcm2835'
 
 if BCM.bcm2835_init.zero?
   puts 'failed to init bcm2835.'

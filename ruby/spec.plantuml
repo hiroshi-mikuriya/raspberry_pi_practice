@@ -14,18 +14,19 @@ package "セルフボール" as selfball {
   package "Raspberry Pi" as rp {
     object "サーバー" as server
     object "Beacon電波計測" as beacon
+    object "Beacon電波発信" as advertiser
     object "LED制御" as led
     object "LCD制御" as lcd
-    object "通知" as advertiser
-    beacon --> advertiser : Beacon電波強度
+    object "通知" as reporter
+    beacon --> reporter : Beacon電波強度
     server --> led  : LED点灯指示（色、期間）
     server  --> lcd : まばたき指示
-    advertiser -l-> lcd : 通信不能
+    reporter -l-> lcd : 通信不能
     led -r[hidden]- lcd
   }
   object "FPGA" as fpga
 }
-advertiser --> god : HTTP\n近くにあるセルフボールID
+reporter --> god : HTTP\n近くにあるセルフボールID
 god --> server : TCP\nLED点灯指示\n（色、点灯時間）
 lcd --> fpga : SPI\nまばたき指示\n（定期 or 指示あり）\nor エラー眼
 led --> fpga : SPI\nLED点灯指示（頻繁）

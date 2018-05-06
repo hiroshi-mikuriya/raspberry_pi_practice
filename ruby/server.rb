@@ -2,7 +2,7 @@ require 'socket'
 require 'json'
 
 ##
-# Server thread
+# Server is prompted for LED instruction from God.
 class Server
   ##
   # @param led {:modified, :mutex, :colors, :interval}

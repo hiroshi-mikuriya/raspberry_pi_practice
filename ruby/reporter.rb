@@ -1,4 +1,5 @@
 require 'json'
+require 'httpclient'
 
 ##
 # Report closed beacons to God.
@@ -50,4 +51,11 @@ class Reporter
   def send_report(data)
     # p({ beacons: data }.to_json)
   end
+end
+
+if $0 == __FILE__
+  default_logs = Hash.new { |h, k| h[k] = [] }
+  beacon_logs = Struct.new(:v, :mutex).new(default_logs, Mutex.new)
+  lcd = Struct.new(:modified, :error).new(false, false)
+  Reporter.new(beacon_logs, lcd)
 end
