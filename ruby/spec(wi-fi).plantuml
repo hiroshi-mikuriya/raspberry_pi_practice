@@ -1,14 +1,14 @@
-@startuml Raspberry Piプロセス
-title Raspberry Piプロセス
+@startuml Raspberry Piプロセス(Wi-Fi版)
+title Raspberry Piプロセス(Wi-Fi版)
 skinparam {
   backgroundcolor AntiqueWhite
   defaultFontName メイリオ
   packageBackgroundColor #DDF
 }
 package PC as pc {
-  object "位置測位サーバー" as positioning
-  object "神様" as god
-  positioning --> god : セルフボール毎の\n趣味趣向
+  object "趣味趣向サーバー" as favorite
+  object "神様" as god
+  favorite --> god : セルフボール毎の\n趣味趣向
 }
 package "セルフボール" as selfball {
   package "Raspberry Pi" as rp {
@@ -18,7 +18,7 @@ package "セルフボール" as selfball {
     object "LED制御" as led
     object "LCD制御" as lcd
     object "通知" as reporter
-    beacon --> reporter : Beacon電波強度
+    beacon --> reporter : Beacon電波強度
     server --> led  : LED点灯指示（色、期間）
     server  --> lcd : まばたき指示
     reporter -l-> lcd : 通信不能
@@ -29,5 +29,5 @@ package "セルフボール" as selfball {
 reporter --> god : HTTP\n近くにあるセルフボールID
 god --> server : TCP\nLED点灯指示\n（色、点灯時間）
 lcd --> fpga : SPI\nまばたき指示\n（定期 or 指示あり）\nor エラー眼
-led --> fpga : SPI\nLED点灯指示（頻繁）
+led --> fpga : SPI\nLED点灯指示（頻繁）
 @enduml

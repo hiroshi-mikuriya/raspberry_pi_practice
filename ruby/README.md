@@ -1,10 +1,61 @@
 # セルフボール（Raspberry Pi）
 
+## タイプ
+
+実証実験では２種類の仕様のセルフボールを用いてそれぞれ検証する。  
+またビデオ撮影のための3つ目の仕様もある。
+
+|種類|概要|
+|:---|:---|
+|Wi-Fi版|ボール同士が接近をサーバーに通知し、サーバーからの指示で発光する。|
+|BLE版|ボール同士が接近したら、ボールが自分で判断して発光する。発光中はBLEを止める。|
+|ビデオ版|ボール同士の接近を検出せず、外部PCからの指示で発光する。|
+
+仕様の種類と対応するソースコードは下表のとおりである。
+
+|.rb|概要|Wi-Fi版|BLE版|ビデオ版|
+|:---|:---|:---:|:---:|:---:|
+|bcm2835|IO操作|o|o|o|
+|beacon|BLE出力・接近検知|出力変更不可|出力変更可・停止あり・発光指示|x|
+|lcd|LCD操作|o|o|o|
+|led|LED操作|o|o|o|
+|main|エントリポイント・仕様毎差異あり|o|o|o|
+|raw|LCD画像|o|o|o|
+|reporter|接近通知|o|x|x|
+|selfball|セルフボールID|o|o|o|
+|server|指示受付|発光指示|趣味変更指示|発光指示|
+
+上記より、仕様毎に変更のあるファイルを以下のように改名 or 変更する
+
+* beacon
+  * beacon_const
+  * beacon_variable
+* main => コマンドライン引数で実行するモードを指定する
+* server
+  * server_led
+  * server_favorite
+
+上記を踏まえて、表を改変する。
+
+|.rb|概要|Wi-Fi版|BLE版|ビデオ版|
+|:---|:---|:---:|:---:|:---:|
+|bcm2835|IO操作|o|o|o|
+|beacon_const|BLE出力・接近検知・出力内容変更不可|o|x|x|
+|beacon_variable|BLE出力・接近検知・出力内容変更可・停止あり・発光指示|x|o|x|
+|lcd|LCD操作|o|o|o|
+|led|LED操作|o|o|o|
+|main|エントリポイント|o|o|o|
+|raw|LCD画像|o|o|o|
+|reporter|接近通知|o|x|x|
+|selfball|セルフボールID|o|o|o|
+|server_led|LED発光指示受付|o|x|o|
+|server_favorite|趣味変更指示受付|x|o|x|
+
 ## 起動関係
 
-/etc/rc.local に以下を記述し、いくつかのプロセスを自動起動する
+/etc/rc.local に以下を記述し、電源起動時にプロセスを自動起動する
 
-```
+```rc.local
 cd /home/pi/workspace/
 sudo ruby main.rb >> selfball.log &
 ruby favorite_server.rb &
@@ -13,7 +64,7 @@ sudo ruby mod_static_ip.rb &
 
 |file|detail|
 |:---|:---|
-|main.rb|趣味趣向の設定を受け付ける</br>LED, LCDを制御する</br>Beaconの発信、計測をする|
+|main.rb|LED, LCD制御</br>Beacon発信・計測|
 |mod_static_ip.rb|固定IPの値を適切（ユニーク）に設定する|
 
 ## Raspberry Pi Zeroのセットアップ手順についての備忘録
@@ -99,7 +150,7 @@ sudo systemctl disable getty@tty1
 sudo systemctl disable hciuart
 ```
 
-/boot/config.txtに以下を追加
+/boot/config.txtに以下を追加
 
 `force_turbo=1`
 
@@ -201,6 +252,8 @@ require 'daemons'をして、Daemons.process内部に処理を記述すると、
 ```
 $ sudo dd if=/dev/disk2 | gzip > backup`date +%Y%m%d`.img.gz
 ```
+
+バックアップファイルの書き込みは、macosの場合はEtcherがお勧め。
 
 ## 参考URL
 

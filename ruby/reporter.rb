@@ -1,13 +1,13 @@
 require 'httpclient'
+require 'json'
+require './beacon_log'
 
 ##
 # Report closed beacons to God.
 class Reporter
-  TIME_LIMIT = 2 # [sec]
-
   ##
   # @param id my selfball id
-  # @param beacon_logs { v: { beacon: [:time, :accuracy] }, mutex: Mutex }
+  # @param beacon_logs [BeaconLog]
   # @param lcd { modified: false, error: false }
   def initialize(id, beacon_logs, lcd)
     loop do
@@ -19,53 +19,41 @@ class Reporter
   ##
   # called by Reporter.initialize
   # @param id my selfball id
-  # @param beacon_logs { v: { beacon: [:time, :accuracy] }, mutex: Mutex }
+  # @param beacon_logs [BeaconLog]
   # @param lcd { modified: false, error: false }
   private def loop_inner_proc(id, beacon_logs, lcd)
-    beacons = closed_beacons(beacon_logs)
+    beacons = beacon_logs.closed_beacons.map { |m| m[:major] }
     send_report(me: id, friends: beacons)
     lcd[:error] = false
-  rescue
+  rescue StandardError
     lcd[:error] = true
-  end
-
-  ##
-  # get closed beacons from beacon logs.
-  # @param beacon_logs
-  private def closed_beacons(beacon_logs)
-    beacon_logs[:mutex].synchronize do
-      remove_old_data beacon_logs[:v]
-      return beacon_logs[:v].each.with_object([]) do |(beacon, logs), o|
-        o.push beacon if logs.size > 5
-      end
-    end
-  end
-
-  ##
-  # @param beacons { beacon: [(:time, :accuracy), ...] }
-  private def remove_old_data(beacons)
-    now = Time.now
-    beacons.each_key do |_, logs|
-      logs.shift until logs.empty? || now - logs.first[:time] < TIME_LIMIT
-    end
   end
 
   ##
   # send closed beacons to God
   private def send_report(data)
+    uri = 'http://192.168.11.2:4567/report'.freeze
     HTTPClient.new do |c|
-      c.connect_timeout = 5
-      c.send_timeout = 5
-      c.receive_timeout = 5
-      c.post('http://192.168.11.2:4567/report', data)
+      c.connect_timeout = 10
+      c.send_timeout = 10
+      c.receive_timeout = 10
+      c.post_content(uri, data.to_json, 'content-type' => 'application/json')
     end
   end
 end
 
 if $0 == __FILE__
-  default_logs = Hash.new { |h, k| h[k] = [] }
-  beacon_logs = Struct.new(:v, :mutex).new(default_logs, Mutex.new)
+  Thread.abort_on_exception = true # exit process if except in thread
+  logs = BeaconLog.new
   lcd = Struct.new(:modified, :error).new(false, false)
   id = 6
-  Reporter.new(id, beacon_logs, lcd)
+  Thread.new do
+    loop do
+      log = { uuid: 'b9407f30f5f8466eaff925556b57fe6d', major: 36, minor: 5, measuredPower: -57, rssi: -34, proximity: 'immediate' }
+      log[:accuracy] = rand(256) / 100.0
+      logs.add log
+      sleep(0.1)
+    end
+  end
+  Reporter.new(id, logs, lcd)
 end
