@@ -13,9 +13,9 @@ class BeaconVariable
   private def monitor_beacon_stop(pid, favorite)
     loop do
       sleep(1)
-      break if @end_monitor
-      next unless favorite[:modified]
+      next unless favorite[:modified] || @found_mathed_selfball
       Process.kill(:KILL, pid)
+      puts %(kill process : #{pid})
       break
     end
   end
@@ -26,17 +26,14 @@ class BeaconVariable
   # @param led [Struct] (:mutex, :colors, :interval)
   # @param lcd [Struct] (:modified, :error)
   # @param favorite [Struct] (:modified, :v)
-  # @param pid beacon process pid
-  private def monitor_beacon_log(logs, log, led, lcd, favorite, pid)
+  private def monitor_beacon_log(logs, log, led, lcd, favorite)
     logs.add(JSON.parse(log, symbolize_names: true))
     cand = candidates(logs, favorite[:v])
     return if cand.empty?
-    winner = cand.keys.max_by { |k| cand[k].to_s(2).cand('1') }
+    winner = cand.keys.max_by { |k| cand[k].to_s(2).count('1') }
     puts %(matched #{winner})
     mod_led_lcd(led, lcd, fav2colors(cand[winner]), FLUSH_LED_INTERVAL)
-    @end_monitor = true
-    Process.kill(:KILL, pid)
-    sleep(FLUSH_LED_INTERVAL)
+    @found_mathed_selfball = true
   end
 
   ##
@@ -83,13 +80,16 @@ class BeaconVariable
   def initialize(uuid, id, led, lcd, favorite)
     logs = BeaconLog.new
     loop do
+      favorite[:modified] = false
       cmd = { proc: 'node', file: 'beacon.js', uuid: uuid, major: id, minor: favorite[:v], measure: -59 }.freeze
       Open3.popen3(cmd.values.join(' ')) do |_i, o, _e, w|
-        @end_monitor = false
+        puts %(start process : #{w.pid})
+        @found_mathed_selfball = false
         th = Thread.new { monitor_beacon_stop(w.pid, favorite) }
-        o.each { |log| monitor_beacon_log(logs, log, led, lcd, w.pid) }
+        o.each { |log| monitor_beacon_log(logs, log, led, lcd, favorite) }
         th.join
       end
+      sleep(FLUSH_LED_INTERVAL) if @found_mathed_selfball
     end
   end
 end
