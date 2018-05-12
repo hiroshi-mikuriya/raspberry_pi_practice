@@ -4,7 +4,7 @@ require './beacon_log'
 
 ##
 # Monitoring and Advertising beacon rssi
-class BeaconConst
+class BeaconVariable
   FLUSH_LED_INTERVAL = 15 # [sec]
 
   ##
@@ -23,7 +23,7 @@ class BeaconConst
   ##
   # @param logs [BeaconLog]
   # @param log [String]
-  # @param led [Struct] (:modified, :mutex, :colors, :interval)
+  # @param led [Struct] (:mutex, :colors, :interval)
   # @param lcd [Struct] (:modified, :error)
   # @param favorite [Struct] (:modified, :v)
   # @param pid beacon process pid
@@ -51,11 +51,14 @@ class BeaconConst
 
   ##
   # set instructions to flush LED and blink Eyes.
+  # @param led [Struct] (:mutex, :colors, :interval)
+  # @param lcd [Struct] (:modified, :error)
+  # @param colors ex. ['red', 'blue']
+  # @param interval flush led interval [sec]
   private def mod_led_lcd(led, lcd, colors, interval)
     led[:mutex].synchronize do
       led[:colors] = colors
       led[:interval] = interval
-      led[:modified] = true
     end
     lcd[:modified] = true
   end
@@ -74,7 +77,7 @@ class BeaconConst
   ##
   # @param uuid Beacon filtering uuid
   # @param id selfball ID
-  # @param led (:modified, :mutex, :colors, :interval)
+  # @param led (:mutex, :colors, :interval)
   # @param lcd (:modified, :error)
   # @param favorite (:modified, :v)
   def initialize(uuid, id, led, lcd, favorite)

@@ -2,7 +2,6 @@ require './led'
 require './lcd'
 require './bcm2835'
 require './selfball'
-require './reporter'
 
 Thread.abort_on_exception = true # exit process if except in thread
 if BCM.bcm2835_init.zero?
@@ -23,14 +22,15 @@ puts %(My id is #{id}.)
 puts %(Mode is #{mode})
 
 lcd = Struct.new(:modified, :error).new(false, false)
-led = Struct.new(:modified, :mutex, :colors, :interval).new(true, Mutex.new, [], 0)
+led = Struct.new(:mutex, :colors, :interval).new(Mutex.new, [], 0)
 
 case mode.downcase
 when 'wifi', 'wi-fi'
   require './beacon_const'
   require './server_led'
   require './beacon_log'
-  uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze
+  require './reporter'
+  uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze # TODO: mod other uuid
   logs = BeaconLog.new
   [
     Thread.new { Led.new(led) },
@@ -40,7 +40,16 @@ when 'wifi', 'wi-fi'
     Thread.new { ServerLed.new(led, lcd) }
   ].each(&:join)
 when 'ble'
-  raise 'not implemented'
+  require './beacon_variable'
+  require './server_favorite'
+  uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze
+  favorite = Struct.new(:modified, :v).new(false, 0b1111_1111_1111_1111)
+  [
+    Thread.new { Led.new(led) },
+    Thread.new { Lcd.new(lcd) },
+    Thread.new { BeaconVariable.new(uuid, id, led, lcd, favorite) },
+    # Thread.new { ServerFavorite.new(led, lcd) }
+  ].each(&:join)
 when 'video'
   require './server_led'
   [

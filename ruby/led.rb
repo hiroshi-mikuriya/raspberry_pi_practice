@@ -4,7 +4,7 @@ require './bcm2835'
 # LED thread
 class Led
   ##
-  # @param led {:modified, :mutex, :colors, :interval}
+  # @param led (:mutex, :colors, :interval)
   def initialize(led)
     stop_demo
     clear_led
@@ -24,7 +24,7 @@ class Led
       flash_led(colors, interval)
       clear_led
     end
-  rescue => e
+  rescue StandardError => e
     puts e
   end
 

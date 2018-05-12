@@ -10,7 +10,7 @@ class Lcd
   # @param lcd { modified: true }
   def initialize(lcd)
     proc(lcd)
-  rescue => e
+  rescue StandardError => e
     puts e
   end
 
