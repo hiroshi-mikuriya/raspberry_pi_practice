@@ -42,7 +42,7 @@ class Reporter
   end
 end
 
-if $0 == __FILE__
+if $PROGRAM_NAME == __FILE__
   Thread.abort_on_exception = true # exit process if except in thread
   logs = BeaconLog.new
   lcd = Struct.new(:modified, :error).new(false, false)

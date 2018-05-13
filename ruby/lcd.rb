@@ -45,7 +45,7 @@ class Lcd
   end
 end
 
-if $0 == __FILE__
+if $PROGRAM_NAME == __FILE__
   if BCM.bcm2835_init.zero?
     puts 'failed to init bcm2835.'
     exit 1
