@@ -7,6 +7,7 @@ class Led
   # @param led (:mutex, :colors, :interval)
   def initialize(led)
     stop_demo
+    stop_sleep_timer
     clear_led
     loop do
       if led[:colors].empty?
@@ -30,6 +31,10 @@ class Led
 
   private def stop_demo
     SPI.write([2, 0, 4, 0].pack('C*'), SPI::CS0)
+  end
+
+  private def stop_sleep_timer
+    SPI.write([2, 0, 6, 0].pack('C*'), SPI::CS0)
   end
 
   private def clear_led
