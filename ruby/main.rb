@@ -30,7 +30,7 @@ when 'wifi', 'wi-fi'
   require './server_led'
   require './beacon_log'
   require './reporter'
-  uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze # TODO: mod other uuid
+  uuid = '11112222-3333-4444-5555-666677778888'.delete('-').downcase.freeze # TODO: mod other uuid
   logs = BeaconLog.new
   [
     Thread.new { Led.new(led) },
@@ -43,12 +43,12 @@ when 'ble'
   require './beacon_variable'
   require './server_favorite'
   uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze
-  favorite = Struct.new(:modified, :v).new(false, 0b1111_1111_1111_1111)
+  favorite = Struct.new(:modified).new(false)
   [
     Thread.new { Led.new(led) },
     Thread.new { Lcd.new(lcd) },
     Thread.new { BeaconVariable.new(uuid, id, led, lcd, favorite) },
-    # Thread.new { ServerFavorite.new(led, lcd) }
+    Thread.new { ServerFavorite.new(favorite) }
   ].each(&:join)
 when 'video'
   require './server_led'

@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'open3'
 require 'json'
 require './beacon_log'
+require './favorite'
 
 ##
 # Monitoring and Advertising beacon rssi
@@ -13,7 +16,7 @@ class BeaconVariable
   private def monitor_beacon_stop(pid, favorite)
     loop do
       sleep(1)
-      next unless favorite[:modified] || @found_mathed_selfball
+      next unless favorite[:modified] || @found_matched_selfball
       Process.kill(:KILL, pid)
       puts %(kill process : #{pid})
       break
@@ -25,15 +28,15 @@ class BeaconVariable
   # @param log [String]
   # @param led [Struct] (:mutex, :colors, :interval)
   # @param lcd [Struct] (:modified, :error)
-  # @param favorite [Struct] (:modified, :v)
+  # @param favorite [Integer]
   private def monitor_beacon_log(logs, log, led, lcd, favorite)
     logs.add(JSON.parse(log, symbolize_names: true))
-    cand = candidates(logs, favorite[:v])
+    cand = candidates(logs, favorite)
     return if cand.empty?
     winner = cand.keys.max_by { |k| cand[k].to_s(2).count('1') }
     puts %(matched #{winner})
     mod_led_lcd(led, lcd, fav2colors(cand[winner]), FLUSH_LED_INTERVAL)
-    @found_mathed_selfball = true
+    @found_matched_selfball = true
   end
 
   ##
@@ -64,10 +67,26 @@ class BeaconVariable
   # convert favorite value to LED colors.
   # @param fav favorite
   private def fav2colors(fav)
-    f = format('%016b', fav).scan(/\d{4}/).to_a
-    colors = %w[yellow green blue red]
-    f.zip(colors).each.with_object([]) do |(v, color), o|
-      o.push color unless v.to_i.zero?
+    colors = %w[red blue green yellow]
+    colors.each.with_index.flat_map do |color, i|
+      (fav & (0b1111 << (i * 4))).zero? ? [] : color
+    end
+  end
+
+  ##
+  # @param cmd start beacon command
+  # @param favorite (:modified)
+  # @param led (:mutex, :colors, :interval)
+  # @param lcd (:modified, :error)
+  private def start_beacon(cmd, favorite, led, lcd)
+    logs = BeaconLog.new
+    Open3.popen3(cmd.values.join(' ')) do |_i, o, _e, w|
+      puts %(start process : #{w.pid})
+      @found_matched_selfball = false
+      favorite[:modified] = false
+      th = Thread.new { monitor_beacon_stop(w.pid, favorite) }
+      o.each { |log| monitor_beacon_log(logs, log, led, lcd, cmd[:minor]) }
+      th.join
     end
   end
 
@@ -76,20 +95,16 @@ class BeaconVariable
   # @param id selfball ID
   # @param led (:mutex, :colors, :interval)
   # @param lcd (:modified, :error)
-  # @param favorite (:modified, :v)
+  # @param favorite (:modified)
   def initialize(uuid, id, led, lcd, favorite)
-    logs = BeaconLog.new
     loop do
-      favorite[:modified] = false
-      cmd = { proc: 'node', file: 'beacon.js', uuid: uuid, major: id, minor: favorite[:v], measure: -59 }.freeze
-      Open3.popen3(cmd.values.join(' ')) do |_i, o, _e, w|
-        puts %(start process : #{w.pid})
-        @found_mathed_selfball = false
-        th = Thread.new { monitor_beacon_stop(w.pid, favorite) }
-        o.each { |log| monitor_beacon_log(logs, log, led, lcd, favorite) }
-        th.join
-      end
-      sleep(FLUSH_LED_INTERVAL) if @found_mathed_selfball
+      fav = Favorite.read
+      p cmd = {
+        proc: 'node', file: 'beacon.js',
+        uuid: uuid, major: id, minor: fav, measure: -59
+      }
+      start_beacon(cmd, favorite, led, lcd)
+      sleep(FLUSH_LED_INTERVAL) if @found_matched_selfball
     end
   end
 end

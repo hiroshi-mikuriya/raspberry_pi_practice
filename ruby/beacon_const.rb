@@ -18,3 +18,10 @@ class BeaconConst
     end
   end
 end
+
+if $PROGRAM_NAME == __FILE__
+  uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D'.delete('-').downcase.freeze # TODO: mod other uuid
+  id = 6
+  logs = BeaconLog.new
+  BeaconConst.new(uuid, id, logs)
+end

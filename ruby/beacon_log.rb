@@ -1,18 +1,14 @@
+# frozen_string_literal: true
+
 ##
 # monitoring beacon logs buffer.
 class BeaconLog
   LOG_LIFE_INTERVAL = 2
-  CLOSED_DISTANCE = 1.2 # [m]
+  CLOSED_DISTANCE = 1.5 # [m]
 
   def initialize
     @mutex = Mutex.new
     clear
-    @th = Thread.new do
-      loop do
-        sleep(LOG_LIFE_INTERVAL)
-        remove_old_logs
-      end
-    end
   end
 
   ##
@@ -28,7 +24,9 @@ class BeaconLog
   # @param log new log
   def add(log)
     @mutex.synchronize do
-      log[:tick] = Time.now
+      now = Time.now
+      remove_old_logs(now)
+      log[:tick] = now
       beacon = %i[major minor].each.with_object({}) { |s, o| o[s] = log[s] }
       @logs[beacon].push log
     end
@@ -39,9 +37,8 @@ class BeaconLog
   # @return closed_beacons [{:major, :minor}, ...]
   def closed_beacons
     @mutex.synchronize do
-      @logs.each.with_object([]) do |(beacon, log), o|
-        o.push beacon if near?(log)
-      end
+      remove_old_logs(Time.now)
+      @logs.keys.select { |beacon| near? @logs[beacon] }
     end
   end
 
@@ -57,20 +54,16 @@ class BeaconLog
     ary.size.odd? ? ary[i] : (ary[i - 1] + ary[i]) / 2
   end
 
-  private def remove_old_logs
-    @mutex.synchronize do
-      now = Time.now
-      @logs.each_key do |beacon|
-        log = @logs[beacon]
-        log.shift until log.empty? || now - log.first[:tick] < LOG_LIFE_INTERVAL
-        @logs.delete beacon if log.empty?
-      end
+  private def remove_old_logs(now)
+    @logs.each_key do |beacon|
+      log = @logs[beacon]
+      log.shift until log.empty? || now - log.first[:tick] < LOG_LIFE_INTERVAL
+      @logs.delete beacon if log.empty?
     end
   end
 end
 
 if $PROGRAM_NAME == __FILE__
-  Thread.abort_on_exception = true # exit process if except in thread
   logs = BeaconLog.new
   Thread.new do
     loop do
